@@ -10,7 +10,6 @@
         <h1>@Model.Title</h1>
         <p class="date-line">@Model.Description</p>
     </div>
-    <button class="primary-button" type="button" disabled title="Se habilitará cuando se conecte la base de datos">＋ @Model.ActionLabel</button>
 </section>
 
 <section class="panel list-panel">
@@ -42,21 +41,20 @@
             </tbody>
         </table>
     </div>
-    <div class="panel-foot">Página 1 de 1 <span>·</span> Datos de demostración</div>
+    <p class="panel-foot" id="empty-results" hidden="@(Model.Rows.Count > 0)">Sin registros para mostrar.</p>
 </section>
-
-<section class="notice-panel">
-    <span class="notice-icon" aria-hidden="true">ⓘ</span>
-    <div><strong>Alcance de esta vista</strong><p>Esta pantalla muestra el diseño y los flujos previstos. Los registros son ficticios; las operaciones se habilitarán al integrar usuarios, permisos y PostgreSQL.</p></div>
-</section>
-
 @section Scripts {
     <script>
         document.querySelector('.search-box input')?.addEventListener('input', (event) => {
             const term = event.target.value.toLocaleLowerCase('es');
+            let count = 0;
             document.querySelectorAll('tbody tr').forEach((row) => {
-                row.hidden = !row.innerText.toLocaleLowerCase('es').includes(term);
+                row.hidden = !row.textContent.toLocaleLowerCase('es').includes(term);
+                if (!row.hidden) count++;
             });
+            document.querySelector(".record-count").textContent = count + " registros";
+            document.getElementById("empty-results").hidden = count > 0;
         });
     </script>
 }
+

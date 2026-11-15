@@ -2,161 +2,88 @@ using System.Diagnostics;
 using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpticaVision.Web.Data;
 using OpticaVision.Web.Models;
 
 namespace OpticaVision.Web.Controllers;
 
 [Authorize]
-public class HomeController : Controller
+public class HomeController(ConsultasOperativas consultas) : Controller
 {
-    private static readonly CultureInfo Nicaragua = CultureInfo.GetCultureInfo("es-NI");
+    private const string Hoy = "(now() AT TIME ZONE 'America/Managua')::date";
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
-        var model = new DashboardViewModel
+        var metrics = new List<DashboardMetric>();
+        var appointments = new List<AppointmentRow>();
+        var stock = new List<LowStockRow>();
+        if (User.IsInRole("superadministrador"))
         {
-            Today = DateTime.Today.ToString("dddd, dd 'de' MMMM 'de' yyyy", Nicaragua),
-            Metrics = new[]
-            {
-                new DashboardMetric("Ventas del día", "C$ 8,450.00", "4 ventas registradas", "▤", "teal"),
-                new DashboardMetric("Citas pendientes", "4", "Para hoy", "◷", "blue"),
-                new DashboardMetric("Pocas existencias", "3", "Productos por reponer", "◇", "amber"),
-                new DashboardMetric("Compras recientes", "2", "C$ 7,500.00 en el mes", "＋", "purple")
-            },
-            Appointments = new[]
-            {
-                new AppointmentRow("09:00", "Ana Martínez", "8888-••••", "Pendiente"),
-                new AppointmentRow("10:00", "Carlos Ruiz", "8777-••••", "Confirmada"),
-                new AppointmentRow("11:00", "Lucía Gómez", "8666-••••", "Pendiente")
-            },
-            LowStock = new[]
-            {
-                new LowStockRow("Lentes de sol clásicos", 3),
-                new LowStockRow("Montura infantil azul", 2),
-                new LowStockRow("Líquido limpiador 60 ml", 4)
-            }
-        };
-
-        return View(model);
+            var resumen = (await consultas.LeerAsync("""
+                SELECT count(*) FILTER (WHERE p.activo AND r.activo AND p.auth_user_id IS NOT NULL)::text,
+                       count(*) FILTER (WHERE p.auth_user_id IS NULL)::text,
+                       count(*) FILTER (WHERE NOT p.activo OR NOT r.activo)::text
+                FROM optica.perfiles p JOIN optica.roles r ON r.id=p.rol_id WHERE r.nombre <> 'cliente'
+                """, ct))[0];
+            metrics.Add(new("Cuentas activas", resumen[0], "Con acceso vinculado", "✓", "teal"));
+            metrics.Add(new("Sin vincular", resumen[1], "Perfiles sin cuenta de acceso", "◎", "blue"));
+            metrics.Add(new("Acceso inactivo", resumen[2], "Por perfil o rol", "−", "amber"));
+        }
+        if (PuedeVerModulo("ventas"))
+        {
+            var ventas = (await consultas.LeerAsync($"""
+                SELECT coalesce(sum(total),0)::text,count(*)::text FROM optica.resumen_ventas
+                WHERE estado='confirmada' AND (fecha AT TIME ZONE 'America/Managua')::date={Hoy}
+                """, ct))[0];
+            metrics.Add(new("Ventas del día", $"C$ {ventas[0]}", $"{ventas[1]} ventas confirmadas", "C$", "teal"));
+        }
+        if (PuedeVerModulo("citas"))
+        {
+            var citas = await consultas.LeerAsync($"""
+                SELECT to_char(a.fecha AT TIME ZONE 'America/Managua','HH24:MI'), concat_ws(' ',c.nombres,c.apellidos),
+                       c.telefono,initcap(a.estado)
+                FROM optica.citas a JOIN optica.clientes c ON c.id=a.cliente_id
+                WHERE (a.fecha AT TIME ZONE 'America/Managua')::date={Hoy} AND a.estado IN ('pendiente','confirmada')
+                ORDER BY a.fecha,a.id
+                """, ct);
+            appointments.AddRange(citas.Select(r => new AppointmentRow(r[0],r[1],r[2],r[3])));
+            metrics.Add(new("Citas pendientes", citas.Count(r => r[3]=="Pendiente").ToString(), "Para hoy", "◷", "blue"));
+        }
+        if (PuedeVerModulo("inventario"))
+        {
+            var bajas = await consultas.LeerAsync("""
+                SELECT nombre || ' · ' || bodega,cantidad::text FROM optica.inventario_actual
+                WHERE stock_bajo ORDER BY cantidad,nombre,bodega,producto_id
+                """, ct);
+            stock.AddRange(bajas.Take(5).Select(r => new LowStockRow(r[0], r[1])));
+            metrics.Add(new("Pocas existencias", bajas.Count.ToString(), "Referencias por bodega", "↓", "amber"));
+        }
+        if (PuedeVerModulo("compras"))
+        {
+            var compras = (await consultas.LeerAsync($"""
+                SELECT count(*)::text,coalesce(sum(total),0)::text FROM optica.resumen_compras
+                WHERE estado='confirmada' AND date_trunc('month',fecha AT TIME ZONE 'America/Managua')=date_trunc('month',{Hoy}::timestamp)
+                """, ct))[0];
+            metrics.Add(new("Compras del mes",compras[0],$"C$ {compras[1]} confirmados","+","purple"));
+        }
+        var fecha = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTimeOffset.UtcNow,"America/Managua");
+        return View(new DashboardViewModel {
+            Today = fecha.ToString("dddd, dd 'de' MMMM 'de' yyyy", CultureInfo.GetCultureInfo("es-NI")),
+            Metrics = metrics, Appointments = appointments, LowStock = stock
+        });
     }
 
-    public IActionResult Module(string module)
+    public async Task<IActionResult> Module(string module, CancellationToken ct)
     {
-        if (!PuedeVerModulo(module))
-            return Forbid();
-        var page = CreateModule(module);
+        if (!PuedeVerModulo(module)) return Forbid();
+        var key = module.ToLowerInvariant();
+        if (key is "clientes" or "kardex" or "recepciones")
+            return RedirectToAction("Index", CultureInfo.InvariantCulture.TextInfo.ToTitleCase(key));
+        var page = await consultas.ModuloAsync(key, ct);
         return page is null ? NotFound() : View(page);
     }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-
-    private static ModulePageViewModel? CreateModule(string? module)
-    {
-        var key = (module ?? string.Empty).ToLowerInvariant();
-        var page = key switch
-        {
-            "citas" => new ModulePageViewModel
-            {
-                Key = key, Title = "Citas", Description = "Organiza y consulta las citas de tus clientes.", ActionLabel = "Nueva cita",
-                Columns = new[] { "Fecha", "Hora", "Cliente", "Teléfono", "Estado", "Referencia" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "14/11/2026", "09:00", "Ana Martínez", "8888-••••", "Pendiente", "CIT-001" },
-                    new[] { "14/11/2026", "10:00", "Carlos Ruiz", "8777-••••", "Confirmada", "CIT-002" },
-                    new[] { "14/11/2026", "11:00", "Lucía Gómez", "8666-••••", "Pendiente", "CIT-003" }
-                }
-            },
-            "ventas" => new ModulePageViewModel
-            {
-                Key = key, Title = "Ventas", Description = "Consulta las operaciones comerciales registradas.", ActionLabel = "Registrar venta",
-                Columns = new[] { "Referencia", "Fecha", "Cliente", "Vendedor", "Total", "Estado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "VEN-001", "14/11/2026", "Ana Martínez", "Equipo de ventas", "C$ 2,450.00", "Confirmada" },
-                    new[] { "VEN-002", "14/11/2026", "Carlos Ruiz", "Equipo de ventas", "C$ 1,800.00", "Confirmada" },
-                    new[] { "VEN-003", "13/11/2026", "Lucía Gómez", "Equipo de ventas", "C$ 4,200.00", "Borrador" }
-                }
-            },
-            "compras" => new ModulePageViewModel
-            {
-                Key = key, Title = "Compras", Description = "Administra órdenes de compra y recepciones de productos.", ActionLabel = "Nueva compra",
-                Columns = new[] { "Referencia", "Proveedor", "Fecha", "Productos", "Total", "Estado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "COM-001", "Distribuidora Central", "12/11/2026", "4 productos", "C$ 5,200.00", "Confirmada" },
-                    new[] { "COM-002", "Óptica Mayorista", "10/11/2026", "3 productos", "C$ 2,300.00", "Borrador" }
-                }
-            },
-            "inventario" => new ModulePageViewModel
-            {
-                Key = key, Title = "Inventario", Description = "Controla existencias, movimientos y niveles de reposición.", ActionLabel = "Nuevo producto",
-                Columns = new[] { "Código", "Producto", "Categoría", "Existencias", "Mínimo", "Estado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "LEN-001", "Lentes de sol clásicos", "Lentes de sol", "3", "5", "Reponer" },
-                    new[] { "MON-014", "Montura infantil azul", "Monturas", "2", "5", "Reponer" },
-                    new[] { "ACC-006", "Líquido limpiador 60 ml", "Accesorios", "4", "5", "Reponer" }
-                }
-            },
-            "recepciones" => new ModulePageViewModel
-            {
-                Key = key, Title = "Recepciones", Description = "Registra la entrada de productos a bodega y consulta su estado.", ActionLabel = "Nueva recepción",
-                Columns = new[] { "Referencia", "Compra", "Bodega", "Fecha", "Responsable", "Estado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "REC-001", "COM-001", "Bodega principal", "14/11/2026", "Almacén", "Confirmada" },
-                    new[] { "REC-002", "COM-002", "Bodega principal", "13/11/2026", "Almacén", "Pendiente" }
-                }
-            },
-            "kardex" => new ModulePageViewModel
-            {
-                Key = key, Title = "Kardex", Description = "Consulta el historial de entradas, salidas y ajustes por producto.", ActionLabel = "Exportar kardex",
-                Columns = new[] { "Fecha", "Producto", "Movimiento", "Entrada", "Salida", "Saldo", "Referencia" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "14/11/2026", "Montura OV-101", "Recepción", "12", "0", "12", "REC-001" },
-                    new[] { "14/11/2026", "Montura OV-101", "Venta", "0", "1", "11", "VEN-001" },
-                    new[] { "13/11/2026", "Lentes CL-205", "Recepción", "8", "0", "8", "REC-002" }
-                }
-            },
-            "clientes" => new ModulePageViewModel
-            {
-                Key = key, Title = "Clientes", Description = "Administra los datos de contacto necesarios para brindar el servicio.", ActionLabel = "Nuevo cliente",
-                Columns = new[] { "Código", "Nombre", "Teléfono", "Correo", "Última visita", "Estado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "CLI-001", "Ana Martínez", "8888-••••", "ana@ejemplo.ni", "14/11/2026", "Activo" },
-                    new[] { "CLI-002", "Carlos Ruiz", "8777-••••", "carlos@ejemplo.ni", "14/11/2026", "Activo" },
-                    new[] { "CLI-003", "Lucía Gómez", "8666-••••", "lucia@ejemplo.ni", "13/11/2026", "Activo" }
-                }
-            },
-            "proveedores" => new ModulePageViewModel
-            {
-                Key = key, Title = "Proveedores", Description = "Consulta y organiza la información comercial de tus proveedores.", ActionLabel = "Nuevo proveedor",
-                Columns = new[] { "Proveedor", "Contacto", "Teléfono", "Correo", "Compras del mes", "Estado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "Distribuidora Central", "Atención comercial", "2255-••••", "ventas@ejemplo.ni", "C$ 5,200.00", "Activo" },
-                    new[] { "Óptica Mayorista", "Atención comercial", "2244-••••", "pedidos@ejemplo.ni", "C$ 2,300.00", "Activo" }
-                }
-            },
-            "reportes" => new ModulePageViewModel
-            {
-                Key = key, Title = "Reportes", Description = "Consulta resúmenes operativos de ventas, compras e inventario.", ActionLabel = "Descargar reporte",
-                Columns = new[] { "Reporte", "Período", "Registros", "Total", "Actualizado" },
-                Rows = new IReadOnlyList<string>[]
-                {
-                    new[] { "Ventas confirmadas", "Noviembre 2026", "24", "C$ 48,650.00", "Hoy" },
-                    new[] { "Compras confirmadas", "Noviembre 2026", "6", "C$ 32,400.00", "Hoy" },
-                    new[] { "Productos por reponer", "Existencias actuales", "3", "—", "Hoy" }
-                }
-            },
-            _ => null
-        };
-
-        return page;
-    }
 
     private bool PuedeVerModulo(string? module) => (module ?? string.Empty).ToLowerInvariant() switch
     {
@@ -169,3 +96,4 @@ public class HomeController : Controller
         _ => false
     };
 }
+

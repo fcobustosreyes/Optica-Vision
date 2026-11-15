@@ -4,7 +4,7 @@ public sealed record DashboardMetric(string Label, string Value, string Detail, 
 
 public sealed record AppointmentRow(string Time, string Client, string Phone, string Status);
 
-public sealed record LowStockRow(string Product, int Units);
+public sealed record LowStockRow(string Product, string Units);
 
 public sealed class DashboardViewModel
 {
@@ -19,7 +19,8 @@ public sealed class ModulePageViewModel
     public required string Key { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
-    public required string ActionLabel { get; init; }
+
     public required IReadOnlyList<string> Columns { get; init; }
     public required IReadOnlyList<IReadOnlyList<string>> Rows { get; init; }
 }
+

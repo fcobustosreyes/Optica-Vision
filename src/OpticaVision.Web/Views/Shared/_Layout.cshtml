@@ -3,16 +3,16 @@
     var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Usuario";
     var navigation = new[]
     {
-        ("inicio", "Inicio", "I"),
-        ("citas", "Citas", "C"),
-        ("ventas", "Ventas", "V"),
-        ("compras", "Compras", "Co"),
-        ("inventario", "Inventario", "In"),
-        ("recepciones", "Recepciones", "Re"),
-        ("kardex", "Kardex", "K"),
-        ("clientes", "Clientes", "Cl"),
-        ("proveedores", "Proveedores", "P"),
-        ("reportes", "Reportes", "R")
+        ("inicio", "Inicio", "M3 10 12 3l9 7v11h-6v-7H9v7H3z"),
+        ("citas", "Citas", "M3 6h18v15H3z M7 3v6m10-6v6M3 11h18"),
+        ("ventas", "Ventas", "M2 4h3l3 12h11l3-9H6 M9 20h2m6 0h2"),
+        ("compras", "Compras", "M3 8h18v13H3z M8 8V4h8v4 M12 11v7m-3-4h6"),
+        ("inventario", "Inventario", "m3 7 9-5 9 5v10l-9 5-9-5z M3 7l9 5 9-5m-9 5v10"),
+        ("recepciones", "Recepciones", "M3 14v7h18v-7 M12 2v13m-5-5 5 5 5-5"),
+        ("kardex", "Kardex", "M4 3h16v18H4z M8 8h8m-8 4h8m-8 4h5"),
+        ("clientes", "Clientes", "M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21v-2a8 6 0 0 1 16 0v2"),
+        ("proveedores", "Proveedores", "M2 21V6l10-3v18m0-13 9 3v10M2 21h20M5 9h3m-3 4h3m7 1h3"),
+        ("reportes", "Reportes", "M3 3v18h18M7 17v-5m5 5V7m5 10V4")
     };
     var allowedPages = role switch
     {
@@ -46,39 +46,39 @@
                     var current = activePage == item.Item1;
                     if (item.Item1 == "inicio")
                     {
-                        <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Index" aria-current="@(current ? "page" : null)">
-                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Index" aria-label="@item.Item2" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="@item.Item3" /></svg></span><span>@item.Item2</span>
                         </a>
                     }
                     else if (item.Item1 == "clientes")
                     {
-                        <a class="nav-link @(current ? "active" : "")" asp-controller="Clientes" asp-action="Index" aria-current="@(current ? "page" : null)">
-                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Clientes" asp-action="Index" aria-label="@item.Item2" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="@item.Item3" /></svg></span><span>@item.Item2</span>
                         </a>
                     }
                     else if (item.Item1 == "recepciones")
                     {
-                        <a class="nav-link @(current ? "active" : "")" asp-controller="Recepciones" asp-action="Index" aria-current="@(current ? "page" : null)">
-                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Recepciones" asp-action="Index" aria-label="@item.Item2" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="@item.Item3" /></svg></span><span>@item.Item2</span>
                         </a>
                     }
                     else if (item.Item1 == "kardex")
                     {
-                        <a class="nav-link @(current ? "active" : "")" asp-controller="Kardex" asp-action="Index" aria-current="@(current ? "page" : null)">
-                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Kardex" asp-action="Index" aria-label="@item.Item2" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="@item.Item3" /></svg></span><span>@item.Item2</span>
                         </a>
                     }
                     else
                     {
-                        <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Module" asp-route-module="@item.Item1" aria-current="@(current ? "page" : null)">
-                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Module" asp-route-module="@item.Item1" aria-label="@item.Item2" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="@item.Item3" /></svg></span><span>@item.Item2</span>
                         </a>
                     }
                 }
                 @if (User.IsInRole("superadministrador") || User.IsInRole("administrador"))
                 {
-                    <a class="nav-link @(activePage == "usuarios" ? "active" : "")" asp-controller="Usuarios" asp-action="Index" aria-current="@(activePage == "usuarios" ? "page" : null)">
-                        <span class="nav-icon" aria-hidden="true">U</span><span>Usuarios</span>
+                    <a class="nav-link @(activePage == "usuarios" ? "active" : "")" aria-label="Usuarios" asp-controller="Usuarios" asp-action="Index" aria-current="@(activePage == "usuarios" ? "page" : null)">
+                        <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2 3 6v6c0 5 5 8 9 10 4-2 9-5 9-10V6z M8 12l3 3 5-6" /></svg></span><span>Usuarios</span>
                     </a>
                 }
             </nav>
@@ -107,3 +107,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

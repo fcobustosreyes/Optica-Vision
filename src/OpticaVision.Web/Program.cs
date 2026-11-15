@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<OpticaDatabase>();
+builder.Services.AddScoped<ConsultasOperativas>();
 var postgresConnection = builder.Configuration.GetConnectionString("OpticaPostgres");
 if (!string.IsNullOrWhiteSpace(postgresConnection))
 {
@@ -146,3 +147,4 @@ app.MapControllerRoute(
 
 
 app.Run();
+

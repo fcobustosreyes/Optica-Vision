@@ -310,3 +310,10 @@ tbody tr:hover { background: #f7fbfc; }
   .auth-card { border-radius: 15px; padding: 30px 23px 25px; }
   .auth-card h1 { font-size: 26px; }
 }
+.warehouse-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-block: 1rem; }
+.nav-icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.dashboard-grid > :only-child { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .metric-grid { grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); }
+}
+[hidden] { display: none !important; }
