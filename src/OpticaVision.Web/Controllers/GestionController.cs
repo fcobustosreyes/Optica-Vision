@@ -116,7 +116,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         "positivo" or "int" => int.TryParse(v,out var n) && n >= (f.Tipo=="positivo"?1:0),
         "importe" or "numeric" => decimal.TryParse(v,NumberStyles.AllowDecimalPoint,CultureInfo.InvariantCulture,out var m)
             && m>=0 && m<1000000000000m && decimal.Round(m,2)==m && (f.Tipo!="importe" || m>0),
-        "metodo" => v is "efectivo" or "tarjeta" or "transferencia",
+        "metodo" => v == "efectivo",
         _ => true
     };
 
@@ -154,7 +154,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
                 expresiones.Add("(select greatest(total-pagado+coalesce((select monto from optica.pagos_venta where id=@id and venta_id=@padre),0),0) from optica.resumen_ventas where id=@padre)");
                 continue;
             }
-            string v = valores.GetValueOrDefault(f.Columna)?.Trim() ?? "";
+            string v = f.Tipo=="metodo" ? "efectivo" : valores.GetValueOrDefault(f.Columna)?.Trim() ?? "";
             p.Valores[f.Columna]=v;
             bool valido = v.Length==0 ? !f.Obligatorio : Valido(f,v) &&
                 (f.OpcionesSql is null || p.Opciones[f.Columna].ContainsKey(v));
@@ -229,6 +229,9 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         return RedirectToAction(nameof(Index),new {tipo,padre});
     }
 }
+
+
+
 
 
 

@@ -14,8 +14,10 @@
     <div class="field"><label for="@f.Columna">@f.Etiqueta</label>
     @if((r.Tabla=="detalle_conteos" && f.Columna is "producto_id" or "cantidad_sistema") || (r.Tabla=="conteos_inventario" && Model.Id.HasValue && f.Columna=="bodega_id")){
         <span>@(Model.Opciones.GetValueOrDefault(f.Columna)?.GetValueOrDefault(valor ?? "") ?? valor)</span>
-    }else if(Model.Opciones.ContainsKey(f.Columna) || f.Tipo=="metodo"){
-        var opciones=f.Tipo=="metodo" ? new Dictionary<string,string>{{"efectivo","Efectivo"},{"tarjeta","Tarjeta"},{"transferencia","Transferencia"}} : Model.Opciones[f.Columna];
+    }else if(f.Tipo=="metodo"){
+        <input value="Efectivo" readonly aria-readonly="true" />
+    }else if(Model.Opciones.ContainsKey(f.Columna)){
+        var opciones=f.Tipo=="metodo" ? new Dictionary<string,string>{{"efectivo","Efectivo"}} : Model.Opciones[f.Columna];
         <select id="@f.Columna" name="valores[@f.Columna]" required="@f.Obligatorio"><option value="">Seleccionar</option>
         @foreach(var opcion in opciones){<option value="@opcion.Key" selected="@(valor==opcion.Key)">@opcion.Value</option>}
         </select>
@@ -86,3 +88,6 @@
 </script>
 }
 }
+
+
+
