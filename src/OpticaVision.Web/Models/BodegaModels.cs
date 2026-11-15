@@ -10,7 +10,8 @@ public sealed record KardexRow(
     long Salida,
     long Saldo,
     string Referencia,
-    string Responsable);
+    string Responsable,
+    string? DocumentoCompra);
 
 public sealed class KardexViewModel
 {
@@ -33,3 +34,4 @@ public sealed class RecepcionesViewModel
     public required string Busqueda { get; init; }
     public required IReadOnlyList<RecepcionRow> Recepciones { get; init; }
 }
+
