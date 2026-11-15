@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using OpticaVision.Web.Auth;
 using OpticaVision.Web.Data;
 
@@ -6,7 +7,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<OpticaDatabase>();
-builder.Services.AddScoped<IClienteRepository, PostgresClienteRepository>();
+var postgresConnection = builder.Configuration.GetConnectionString("OpticaPostgres");
+if (!string.IsNullOrWhiteSpace(postgresConnection))
+{
+    var postgresSettings = new Npgsql.NpgsqlConnectionStringBuilder(postgresConnection)
+    {
+        SslMode = Npgsql.SslMode.VerifyFull,
+        TrustServerCertificate = false,
+        Pooling = true,
+        MaxPoolSize = 10,
+        Timeout = 15,
+        CommandTimeout = 30
+    };
+    builder.Services.AddDbContextFactory<OpticaDbContext>(options => options.UseNpgsql(postgresSettings.ConnectionString));
+    builder.Services.AddScoped<IClienteRepository, EfClienteRepository>();
+}
+else
+{
+    builder.Services.AddScoped<IClienteRepository, PostgresClienteRepository>();
+}
 builder.Services.AddScoped<IPerfilRepository, PostgresPerfilRepository>();
 builder.Services.AddScoped<PerfilCookieEvents>();
 builder.Services.AddHttpClient<ISupabaseAuthClient, SupabaseAuthClient>(client =>
