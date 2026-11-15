@@ -1,0 +1,24 @@
+@model SetupForm
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Configuración inicial · Óptica Visión</title><link rel="stylesheet" href="~/css/site.css" /></head>
+<body class="auth-page">
+    <main class="auth-card">
+        <span class="brand-mark">OV</span><p class="eyebrow">Configuración de primera ejecución</p><h1>Crear superadministrador</h1>
+        <p class="auth-description">Esta página solo funciona mientras exista un código temporal en la configuración privada y aún no haya un superadministrador.</p>
+        <form method="post" asp-controller="ConfiguracionInicial" asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+            <div class="field"><label asp-for="NombreCompleto"></label><input asp-for="NombreCompleto" autocomplete="name" /><span asp-validation-for="NombreCompleto"></span></div>
+            <div class="field"><label asp-for="Correo"></label><input asp-for="Correo" autocomplete="email" inputmode="email" /><span asp-validation-for="Correo"></span></div>
+            <div class="field"><label asp-for="Contrasena"></label><input asp-for="Contrasena" autocomplete="new-password" /><span asp-validation-for="Contrasena"></span></div>
+            <div class="field"><label asp-for="ConfirmarContrasena"></label><input asp-for="ConfirmarContrasena" autocomplete="new-password" /><span asp-validation-for="ConfirmarContrasena"></span></div>
+            <div class="field"><label asp-for="TokenConfiguracion"></label><input asp-for="TokenConfiguracion" autocomplete="off" /><span asp-validation-for="TokenConfiguracion"></span></div>
+            <button class="primary-button auth-submit" type="submit">Crear cuenta inicial</button>
+        </form>
+        <p class="auth-footnote">Elimina Bootstrap:Token de User Secrets cuando termines. La contraseña se registra únicamente en Supabase Auth.</p>
+    </main>
+</body>
+</html>

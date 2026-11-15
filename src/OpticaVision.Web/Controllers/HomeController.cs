@@ -1,10 +1,12 @@
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpticaVision.Web.Models;
 
 namespace OpticaVision.Web.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private static readonly CultureInfo Nicaragua = CultureInfo.GetCultureInfo("es-NI");

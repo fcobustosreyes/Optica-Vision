@@ -1,15 +1,16 @@
 @{
     var activePage = ViewData["ActivePage"]?.ToString() ?? "inicio";
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Usuario";
     var navigation = new[]
     {
-        ("inicio", "Inicio", "⌂", "Index"),
-        ("citas", "Citas", "◷", "Module"),
-        ("ventas", "Ventas", "▤", "Module"),
-        ("compras", "Compras", "▧", "Module"),
-        ("inventario", "Inventario", "◇", "Module"),
-        ("clientes", "Clientes", "♧", "Module"),
-        ("proveedores", "Proveedores", "▣", "Module"),
-        ("reportes", "Reportes", "▥", "Module")
+        ("inicio", "Inicio", "⌂"),
+        ("citas", "Citas", "◷"),
+        ("ventas", "Ventas", "＄"),
+        ("compras", "Compras", "▣"),
+        ("inventario", "Inventario", "▤"),
+        ("clientes", "Clientes", "♙"),
+        ("proveedores", "Proveedores", "♧"),
+        ("reportes", "Reportes", "▥")
     };
 }
 <!DOCTYPE html>
@@ -25,8 +26,7 @@
     <div class="app-shell">
         <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
             <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Óptica Visión, inicio">
-                <span class="brand-mark">OV</span>
-                <span class="brand-name">Óptica Visión</span>
+                <span class="brand-mark">OV</span><span class="brand-name">Óptica Visión</span>
             </a>
             <p class="sidebar-caption">Gestión administrativa</p>
             <nav class="main-nav">
@@ -39,6 +39,12 @@
                             <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
                         </a>
                     }
+                    else if (item.Item1 == "clientes")
+                    {
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Clientes" asp-action="Index" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        </a>
+                    }
                     else
                     {
                         <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Module" asp-route-module="@item.Item1" aria-current="@(current ? "page" : null)">
@@ -46,22 +52,30 @@
                         </a>
                     }
                 }
+                @if (User.IsInRole("superadministrador") || User.IsInRole("administrador"))
+                {
+                    <a class="nav-link @(activePage == "usuarios" ? "active" : "")" asp-controller="Usuarios" asp-action="Index" aria-current="@(activePage == "usuarios" ? "page" : null)">
+                        <span class="nav-icon" aria-hidden="true">U</span><span>Usuarios</span>
+                    </a>
+                }
             </nav>
             <div class="sidebar-footer"><span class="status-dot"></span> Sistema de gestión</div>
         </aside>
-
         <div class="main-area">
             <header class="topbar">
                 <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">☰</button>
                 <div class="topbar-title">@ViewData["Title"]</div>
                 <div class="user-menu" aria-label="Usuario actual">
-                    <span class="avatar" aria-hidden="true">FB</span>
-                    <span class="user-copy"><strong>Francisco Bustos</strong><small>Administrador</small></span>
+                    <span class="avatar" aria-hidden="true">@((User.Identity?.Name ?? "OV").Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.FirstOrDefault())</span>
+                    <span class="user-copy"><strong>@User.Identity?.Name</strong><small>@role</small></span>
                 </div>
+                <form method="post" asp-controller="Cuenta" asp-action="CerrarSesion" class="logout-form">
+                    <button class="text-button logout-button" type="submit">Salir</button>
+                </form>
             </header>
             <main class="content" id="mainContent">
                 @RenderBody()
-                <p class="demo-note"><span aria-hidden="true">ⓘ</span> Vista inicial con datos demostrativos. No usar con datos reales hasta activar autenticación, permisos y conexión segura a la base de datos.</p>
+                <p class="demo-note"><span aria-hidden="true">i</span> Clientes ya usa PostgreSQL. Las demás pantallas siguen en desarrollo.</p>
             </main>
         </div>
     </div>

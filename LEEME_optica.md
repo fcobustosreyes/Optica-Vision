@@ -2,9 +2,9 @@
 
 ## Instalacion
 
-`optica_vision.sql` es un script inicial para una base PostgreSQL vacía. **No lo ejecute en el proyecto Supabase amyjnztkqlxobpbreslj:** ese proyecto ya tiene el esquema `optica`, tablas y datos. Ejecutarlo allí fallaría al crear objetos existentes y no es una migración.
+`optica_vision.sql` es un script inicial para una base PostgreSQL vacía. **No lo ejecute en el proyecto Supabase amyjnztkqlxobpbreslj:** ese proyecto ya tiene el esquema `optica`, tablas y datos. Ejecutarlo allí fallaría al crear objetos existentes.
 
-La inspección disponible del proyecto Supabase encontró 20 tablas y 4 vistas. Sus roles actuales son anteriores al diseño acordado. Para actualizarlo se requiere una migración revisada que conserve identificadores, perfiles, operaciones e historial; esta migración todavía no se ha aplicado. El script inicial crea 20 tablas y los cinco roles acordados (`superadministrador`, `administrador`, `ventas`, `recepcion` y `cliente`), además de categorías y una bodega inicial. No crea cuentas, contraseñas ni transacciones reales.
+La inspección disponible del proyecto Supabase encontró 20 tablas y 4 vistas. El archivo `docs/Preparar_Supabase_Existente.sql` agrega los campos de acceso y auditoría, incorpora los roles acordados y conserva los identificadores e historiales. Antes de ejecutarlo, respalde la base y revise el script. El script inicial crea 21 tablas y los cinco roles acordados (`superadministrador`, `administrador`, `ventas`, `recepcion` y `cliente`), además de categorías y una bodega inicial. No crea cuentas, contraseñas ni transacciones reales.
 
 La instalacion es transaccional: un error revierte la instalacion completa. No vuelva a ejecutar el archivo sobre el esquema existente; no es una migracion ni borra tablas anteriores.
 
@@ -12,13 +12,13 @@ La instalacion es transaccional: un error revierte la instalacion completa. No v
 
 Esta entrega es la base de datos comercial para una aplicacion ASP.NET Core que se conecta desde su servidor. El esquema no concede acceso al navegador ni expone funciones publicas. No configure el esquema como expuesto en la API de Supabase sin definir primero permisos y politicas RLS.
 
-`perfiles` identifica a usuarios y su rol dentro de la óptica. No guarda contraseñas ni implementa por sí solo el inicio de sesión. La aplicación ASP.NET Core deberá integrar un proveedor de identidad antes de guardar datos reales. La interfaz actual es una vista demostrativa y todavía no está conectada a Supabase.
+`perfiles` identifica a usuarios y su rol dentro de la óptica. No guarda contraseñas. El código ASP.NET Core incluye autenticación con Supabase Auth, perfiles, asignación de roles y administración de cuentas; aún requiere aplicar `docs/Preparar_Supabase_Existente.sql` y configurar secretos del servidor. El módulo Clientes incluye CRUD con desactivación y auditoría. Las otras pantallas siguen siendo demostrativas. No guarde datos reales hasta terminar la configuración y validar la conexión.
 
 La tabla `roles` no equivale a roles del servidor PostgreSQL. El backend debe autenticar al usuario, comprobar el rol, la empresa y los permisos de cada operación, verificar que esté activo y asignar su identificador como responsable. Los campos de responsables no verifican automáticamente quién hizo la petición. Para anulaciones, los movimientos conservan el responsable original del documento; una auditoría del usuario que anula requiere ampliar esta versión.
 
 Los roles de aplicación son: superadministrador de plataforma, administrador de óptica, ventas, recepción y cliente. El superadministrador no obtiene acceso ordinario a los datos de las ópticas. La versión actual del esquema no incluye aislamiento entre varias empresas; antes de ofrecer una instalación compartida se debe incorporar y verificar el aislamiento por empresa. Cada consulta y escritura deberá quedar limitada al tenant del usuario autenticado.
 
-Antes de conectar la aplicación, crear un usuario PostgreSQL propio para el servidor y concederle solo los permisos necesarios sobre este esquema. No usar la cuenta propietaria ni una clave de servicio en el navegador. Guardar las credenciales solo como secretos del servidor (por ejemplo, User Secrets en desarrollo y variables seguras en producción), nunca en archivos versionados o código enviado al cliente. La configuración de permisos y autenticación queda pendiente.
+Antes de conectar la aplicación, crear un usuario PostgreSQL propio para el servidor y concederle solo los permisos necesarios sobre este esquema. No usar la cuenta propietaria ni una clave de servicio en el navegador. Guardar las credenciales solo como secretos del servidor (por ejemplo, User Secrets en desarrollo y variables seguras en producción), nunca en archivos versionados o código enviado al cliente. La conexión de producción y los permisos mínimos del usuario PostgreSQL siguen pendientes de configuración y verificación.
 
 ## CRUD y política de bajas
 

@@ -13,13 +13,25 @@ CREATE TABLE roles (
 );
 CREATE TABLE perfiles (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ auth_user_id uuid,
+ correo_login varchar(254),
  rol_id bigint NOT NULL REFERENCES roles,
  nombre_completo varchar(150) NOT NULL,
  activo boolean NOT NULL DEFAULT true,
+ debe_cambiar_contrasena boolean NOT NULL DEFAULT false,
  creado_en timestamptz NOT NULL DEFAULT now()
 );
 -- perfiles.id puede vincularse al proveedor de autenticacion elegido.
 -- No almacene contrasenas en perfiles.
+CREATE TABLE auditoria_eventos (
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ actor_perfil_id uuid REFERENCES perfiles,
+ tipo varchar(60) NOT NULL,
+ entidad varchar(80) NOT NULL,
+ entidad_id bigint,
+ detalles jsonb NOT NULL DEFAULT '{}'::jsonb,
+ registrado_en timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE clientes (
  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
  codigo varchar(30) NOT NULL UNIQUE,
@@ -407,6 +419,9 @@ CREATE VIEW pendientes_compra AS
  LEFT JOIN recepciones r ON r.id=dr.recepcion_id GROUP BY dc.id;
 
 CREATE INDEX ON perfiles(rol_id);
+CREATE UNIQUE INDEX ON perfiles(auth_user_id) WHERE auth_user_id IS NOT NULL;
+CREATE UNIQUE INDEX ON perfiles(lower(correo_login)) WHERE correo_login IS NOT NULL;
+CREATE INDEX ON auditoria_eventos(entidad,entidad_id,registrado_en);
 CREATE INDEX ON productos(categoria_id);
 CREATE INDEX ON productos(marca_id);
 CREATE INDEX ON clientes(telefono);

@@ -1,0 +1,14 @@
+@model UsuarioForm
+@{
+    ViewData["Title"] = "Nuevo usuario";
+    ViewData["ActivePage"] = "usuarios";
+    var roles = (IReadOnlyList<string>)ViewBag.Roles;
+}
+<section class="module-intro"><div><p class="eyebrow">Usuarios</p><h1>Crear usuario</h1><p class="date-line">La cuenta se registra en Supabase Auth; el rol queda vinculado al perfil de la óptica.</p></div></section>
+<section class="panel form-panel"><form method="post" asp-action="Crear"><div asp-validation-summary="ModelOnly" class="validation-summary"></div><div class="form-grid">
+    <div class="field"><label asp-for="NombreCompleto"></label><input asp-for="NombreCompleto" autocomplete="name" /><span asp-validation-for="NombreCompleto"></span></div>
+    <div class="field"><label asp-for="Correo"></label><input asp-for="Correo" autocomplete="email" inputmode="email" /><span asp-validation-for="Correo"></span></div>
+    <div class="field"><label asp-for="Rol"></label><select asp-for="Rol"><option value="">Seleccione un rol</option>@foreach (var rol in roles){<option value="@rol">@rol</option>}</select><span asp-validation-for="Rol"></span></div>
+    <div class="field"><label asp-for="ContrasenaTemporal"></label><input asp-for="ContrasenaTemporal" autocomplete="new-password" /><span asp-validation-for="ContrasenaTemporal"></span></div>
+    <div class="field"><label asp-for="ConfirmarContrasena"></label><input asp-for="ConfirmarContrasena" autocomplete="new-password" /><span asp-validation-for="ConfirmarContrasena"></span></div>
+</div><p class="form-hint">Comparte la contraseña temporal por un canal seguro. La persona deberá cambiarla al iniciar sesión. No se guarda en el código ni en la base de negocio.</p><div class="form-actions"><a class="secondary-button" asp-action="Index">Cancelar</a><button class="primary-button" type="submit">Crear cuenta</button></div></form></section>

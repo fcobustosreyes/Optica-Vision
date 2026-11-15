@@ -1,0 +1,26 @@
+@model ClienteForm
+@{
+    var id = ViewData["ClienteId"] as long?;
+    var editar = id.HasValue;
+    ViewData["Title"] = editar ? "Editar cliente" : "Nuevo cliente";
+    ViewData["ActivePage"] = "clientes";
+}
+
+<section class="module-intro">
+    <div><p class="eyebrow">Clientes</p><h1>@ViewData["Title"]</h1><p class="date-line">@(editar ? $"Código {ViewData["Codigo"]}; el código original se conserva." : "Solo solicita los datos de contacto necesarios.")</p></div>
+</section>
+<section class="panel form-panel">
+    <form method="post" asp-action="@(editar ? "Editar" : "Crear")" asp-route-id="@id">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="form-grid">
+            <div class="field"><label asp-for="Nombres"></label><input asp-for="Nombres" autocomplete="given-name" /><span asp-validation-for="Nombres"></span></div>
+            <div class="field"><label asp-for="Apellidos"></label><input asp-for="Apellidos" autocomplete="family-name" /><span asp-validation-for="Apellidos"></span></div>
+            <div class="field"><label asp-for="Telefono"></label><input asp-for="Telefono" autocomplete="tel" /><span asp-validation-for="Telefono"></span></div>
+            <div class="field"><label asp-for="Correo"></label><input asp-for="Correo" autocomplete="email" /><span asp-validation-for="Correo"></span></div>
+            <div class="field field-wide"><label asp-for="Direccion"></label><textarea asp-for="Direccion" rows="3" autocomplete="street-address"></textarea><span asp-validation-for="Direccion"></span></div>
+        </div>
+        <div class="form-actions"><a class="secondary-button" asp-action="Index">Cancelar</a><button class="primary-button" type="submit">@(editar ? "Guardar cambios" : "Registrar cliente")</button></div>
+    </form>
+</section>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

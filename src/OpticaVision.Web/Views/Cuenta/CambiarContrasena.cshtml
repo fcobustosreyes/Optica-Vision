@@ -1,0 +1,15 @@
+@model CambiarContrasenaForm
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Cambiar contraseña · Óptica Visión</title><link rel="stylesheet" href="~/css/site.css" /></head>
+<body class="auth-page"><main class="auth-card"><span class="brand-mark">OV</span><p class="eyebrow">Seguridad de la cuenta</p><h1>Cambia tu contraseña</h1><p class="auth-description">Para proteger la cuenta, debes reemplazar la contraseña temporal antes de usar el sistema. Usa al menos 12 caracteres.</p>
+    <form method="post" asp-controller="Cuenta" asp-action="CambiarContrasena"><div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="field"><label asp-for="NuevaContrasena"></label><input asp-for="NuevaContrasena" autocomplete="new-password" /><span asp-validation-for="NuevaContrasena"></span></div>
+        <div class="field"><label asp-for="ConfirmarContrasena"></label><input asp-for="ConfirmarContrasena" autocomplete="new-password" /><span asp-validation-for="ConfirmarContrasena"></span></div>
+        <button class="primary-button auth-submit" type="submit">Actualizar contraseña</button>
+    </form>
+    <form method="post" asp-controller="Cuenta" asp-action="CerrarSesion" class="auth-logout"><button class="text-button" type="submit">Cerrar sesión</button></form>
+</main></body></html>

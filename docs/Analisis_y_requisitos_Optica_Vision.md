@@ -4,12 +4,11 @@
 
 ## 1. Propósito y estado
 
-Óptica Visión se plantea como un sistema administrativo para una óptica nicaragüense. La primera entrega se construye con ASP.NET Core y PostgreSQL en Supabase. El prototipo de Figma define la navegación y el diseño inicial: Inicio, Citas, Ventas, Compras, Inventario, Clientes, Proveedores y Reportes.
+Óptica Visión se plantea como un sistema administrativo para una óptica nicaragüense, desarrollado con ASP.NET Core y PostgreSQL en Supabase. El prototipo de Figma define la navegación y el diseño inicial. El código ahora contiene autenticación/perfiles, administración básica de usuarios y CRUD de clientes con auditoría; las demás áreas siguen siendo demostrativas.
 
-La interfaz ASP.NET Core ya está iniciada y muestra registros ficticios para desarrollar el diseño. **Todavía no tiene autenticación ni conexión operativa con Supabase; no debe utilizarse para guardar datos reales.** El proyecto de Supabase indicado por el propietario no se pudo inspeccionar desde la conexión disponible, por lo que no se aplicaron cambios a su base.
+El esquema incremental para el proyecto Supabase existente está preparado en `docs/Preparar_Supabase_Existente.sql`, pero no se ha aplicado al proyecto remoto. La aplicación todavía necesita claves privadas configuradas en el servidor, restaurar Npgsql desde NuGet y verificar la conexión antes de guardar datos reales. El sitio no está publicado.
 
-Este análisis separa los requisitos del producto de las obligaciones que corresponden a cada óptica cliente. La revisión es una base de diseño para el proyecto académico y no sustituye una revisión legal, tributaria o sanitaria antes de vender o poner el sistema en producción.
-
+Este análisis separa los requisitos del producto de las obligaciones que corresponden a cada óptica cliente. Es una base de diseño para el proyecto académico y no sustituye una revisión legal, tributaria o sanitaria antes de vender o poner el sistema en producción. El manual técnico y la guía de inicio están en `docs/Manual_Tecnico_Optica_Vision.md` y `README.md`.
 ## 2. Alcance inicial
 
 La primera versión contempla agenda de citas, clientes y datos de contacto mínimos, productos, proveedores, compras, recepción de inventario, ventas internas, pagos registrados, existencias y reportes operativos. Los documentos de compra y venta mantienen sus estados y sus movimientos de inventario conforme al modelo PostgreSQL existente.
