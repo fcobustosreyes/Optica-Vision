@@ -97,8 +97,8 @@ public sealed class UsuariosController(
     private void PrepararRoles()
     {
         var roles = User.IsInRole("superadministrador")
-            ? new[] { "superadministrador", "administrador", "ventas", "recepcion", "cliente" }
-            : new[] { "ventas", "recepcion", "cliente" };
+            ? new[] { "superadministrador", "administrador", "ventas", "recepcion", "bodega" }
+            : new[] { "ventas", "recepcion", "bodega" };
         ViewBag.Roles = roles;
         ViewData["Title"] = "Nuevo usuario";
         ViewData["ActivePage"] = "usuarios";
@@ -107,7 +107,7 @@ public sealed class UsuariosController(
     private bool RolPermitido(string rol) => rol switch
     {
         "superadministrador" or "administrador" => User.IsInRole("superadministrador"),
-        "ventas" or "recepcion" or "cliente" => User.IsInRole("administrador") || User.IsInRole("superadministrador"),
+        "ventas" or "recepcion" or "bodega" => User.IsInRole("administrador") || User.IsInRole("superadministrador"),
         _ => false
     };
 

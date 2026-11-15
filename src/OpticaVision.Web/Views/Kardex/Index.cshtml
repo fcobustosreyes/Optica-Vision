@@ -1,0 +1,50 @@
+@model KardexViewModel
+@{
+    ViewData["Title"] = "Kardex";
+    ViewData["ActivePage"] = "kardex";
+}
+
+<section class="module-intro">
+    <div>
+        <p class="eyebrow">Bodega · trazabilidad de inventario</p>
+        <h1>Kardex</h1>
+        <p class="date-line">Historial de entradas, salidas y ajustes con saldo acumulado por producto y bodega.</p>
+    </div>
+</section>
+
+<section class="panel list-panel">
+    <form method="get" class="list-toolbar">
+        <label class="search-box"><span aria-hidden="true">&#9906;</span><input type="search" name="buscar" value="@Model.Busqueda" placeholder="Buscar producto, movimiento o referencia" /></label>
+        <span class="record-count">@Model.Movimientos.Count movimientos</span>
+    </form>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Fecha</th><th>Bodega</th><th>C&oacute;digo</th><th>Producto</th><th>Movimiento</th><th>Entrada</th><th>Salida</th><th>Saldo</th><th>Referencia</th><th>Responsable</th></tr></thead>
+            <tbody>
+                @if (Model.Movimientos.Count == 0)
+                {
+                    <tr><td class="empty-cell" colspan="10">Todav&iacute;a no hay movimientos de inventario.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.Movimientos)
+                    {
+                        <tr>
+                            <td>@item.Fecha.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.Bodega</td>
+                            <td class="time-cell">@item.CodigoProducto</td>
+                            <td>@item.Producto</td>
+                            <td>@item.TipoMovimiento</td>
+                            <td class="number-cell entrada">@(item.Entrada == 0 ? "—" : item.Entrada.ToString())</td>
+                            <td class="number-cell salida">@(item.Salida == 0 ? "—" : item.Salida.ToString())</td>
+                            <td class="number-cell">@item.Saldo</td>
+                            <td>@item.Referencia</td>
+                            <td>@item.Responsable</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-foot">El saldo se calcula en orden cronol&oacute;gico. Se muestran hasta 200 movimientos recientes.</div>
+</section>

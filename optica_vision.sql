@@ -451,6 +451,9 @@ INSERT INTO roles(nombre,descripcion) VALUES
  ('ventas','Registra ventas y consulta los datos necesarios para atender al cliente.'),
  ('recepcion','Gestiona citas y consulta los datos mínimos de contacto.'),
  ('cliente','Accede únicamente a su propio perfil y a sus citas.');
+INSERT INTO roles(nombre,descripcion) VALUES
+ ('bodega','Gestiona recepciones, existencias y el kardex de inventario.')
+ON CONFLICT (nombre) DO NOTHING;
 INSERT INTO categorias(nombre) VALUES ('Monturas'),('Lentes'),('Accesorios');
 INSERT INTO bodegas(nombre,ubicacion) VALUES ('Bodega principal','Sucursal principal');
 

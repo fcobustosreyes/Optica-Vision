@@ -5,7 +5,7 @@ using OpticaVision.Web.Models;
 
 namespace OpticaVision.Web.Controllers;
 
-[Authorize(Roles = "superadministrador,administrador,ventas,recepcion")]
+[Authorize(Roles = "administrador,ventas,recepcion")]
 [Route("clientes")]
 public sealed class ClientesController(IClienteRepository clientes, OpticaDatabase database) : Controller
 {

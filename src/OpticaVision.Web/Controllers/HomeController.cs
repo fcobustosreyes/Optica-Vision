@@ -42,6 +42,8 @@ public class HomeController : Controller
 
     public IActionResult Module(string module)
     {
+        if (!PuedeVerModulo(module))
+            return Forbid();
         var page = CreateModule(module);
         return page is null ? NotFound() : View(page);
     }
@@ -97,6 +99,27 @@ public class HomeController : Controller
                     new[] { "ACC-006", "Líquido limpiador 60 ml", "Accesorios", "4", "5", "Reponer" }
                 }
             },
+            "recepciones" => new ModulePageViewModel
+            {
+                Key = key, Title = "Recepciones", Description = "Registra la entrada de productos a bodega y consulta su estado.", ActionLabel = "Nueva recepción",
+                Columns = new[] { "Referencia", "Compra", "Bodega", "Fecha", "Responsable", "Estado" },
+                Rows = new IReadOnlyList<string>[]
+                {
+                    new[] { "REC-001", "COM-001", "Bodega principal", "14/11/2026", "Almacén", "Confirmada" },
+                    new[] { "REC-002", "COM-002", "Bodega principal", "13/11/2026", "Almacén", "Pendiente" }
+                }
+            },
+            "kardex" => new ModulePageViewModel
+            {
+                Key = key, Title = "Kardex", Description = "Consulta el historial de entradas, salidas y ajustes por producto.", ActionLabel = "Exportar kardex",
+                Columns = new[] { "Fecha", "Producto", "Movimiento", "Entrada", "Salida", "Saldo", "Referencia" },
+                Rows = new IReadOnlyList<string>[]
+                {
+                    new[] { "14/11/2026", "Montura OV-101", "Recepción", "12", "0", "12", "REC-001" },
+                    new[] { "14/11/2026", "Montura OV-101", "Venta", "0", "1", "11", "VEN-001" },
+                    new[] { "13/11/2026", "Lentes CL-205", "Recepción", "8", "0", "8", "REC-002" }
+                }
+            },
             "clientes" => new ModulePageViewModel
             {
                 Key = key, Title = "Clientes", Description = "Administra los datos de contacto necesarios para brindar el servicio.", ActionLabel = "Nuevo cliente",
@@ -134,4 +157,15 @@ public class HomeController : Controller
 
         return page;
     }
+
+    private bool PuedeVerModulo(string? module) => (module ?? string.Empty).ToLowerInvariant() switch
+    {
+        "citas" => User.IsInRole("administrador") || User.IsInRole("recepcion"),
+        "ventas" => User.IsInRole("administrador") || User.IsInRole("ventas"),
+        "compras" or "proveedores" or "reportes" => User.IsInRole("administrador"),
+        "inventario" => User.IsInRole("administrador") || User.IsInRole("ventas") || User.IsInRole("bodega"),
+        "recepciones" or "kardex" => User.IsInRole("administrador") || User.IsInRole("bodega"),
+        "clientes" => User.IsInRole("administrador") || User.IsInRole("ventas") || User.IsInRole("recepcion"),
+        _ => false
+    };
 }
