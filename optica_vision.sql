@@ -8,7 +8,8 @@ SET LOCAL search_path = optica, pg_catalog;
 
 CREATE TABLE roles (
  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
- nombre varchar(40) NOT NULL UNIQUE, descripcion text
+ nombre varchar(40) NOT NULL UNIQUE, descripcion text,
+ activo boolean NOT NULL DEFAULT true
 );
 CREATE TABLE perfiles (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -25,6 +26,16 @@ CREATE TABLE clientes (
  nombres varchar(100) NOT NULL, apellidos varchar(100) NOT NULL,
  telefono varchar(30), correo varchar(254), direccion text,
  activo boolean NOT NULL DEFAULT true, creado_en timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE citas (
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ cliente_id bigint NOT NULL REFERENCES clientes,
+ fecha timestamptz NOT NULL,
+ servicio varchar(120) NOT NULL,
+ estado varchar(20) NOT NULL DEFAULT 'pendiente'
+ CHECK (estado IN ('pendiente','confirmada','completada','cancelada')),
+ notas text,
+ creado_en timestamptz NOT NULL DEFAULT now()
 );
 CREATE TABLE proveedores (
  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -420,12 +431,18 @@ CREATE INDEX ON movimientos_inventario(producto_id);
 CREATE INDEX ON movimientos_inventario(usuario_id);
 
 INSERT INTO roles(nombre,descripcion) VALUES
- ('administrador','Administracion del sistema'),('vendedor','Registro de ventas'),
- ('bodeguero','Compras, recepciones y conteos');
+ ('superadministrador','Gestiona la plataforma y las empresas cliente; el acceso a datos operativos requiere autorización y auditoría.'),
+ ('administrador','Administra los usuarios y operaciones de su propia óptica.'),
+ ('ventas','Registra ventas y consulta los datos necesarios para atender al cliente.'),
+ ('recepcion','Gestiona citas y consulta los datos mínimos de contacto.'),
+ ('cliente','Accede únicamente a su propio perfil y a sus citas.');
 INSERT INTO categorias(nombre) VALUES ('Monturas'),('Lentes'),('Accesorios');
 INSERT INTO bodegas(nombre,ubicacion) VALUES ('Bodega principal','Sucursal principal');
 
 REVOKE ALL ON ALL TABLES IN SCHEMA optica FROM PUBLIC;
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA optica FROM PUBLIC;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA optica FROM PUBLIC;
+-- No conceda DELETE al rol de ejecución de la aplicación. Use bajas lógicas
+-- (activo=false) y estados de anulación/cancelación para conservar trazabilidad.
+-- Roles definidos: superadministrador, administrador, ventas, recepcion y cliente.
 COMMIT;

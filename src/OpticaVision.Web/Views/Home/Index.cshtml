@@ -1,0 +1,62 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Inicio";
+    ViewData["ActivePage"] = "inicio";
+}
+
+<section class="welcome-row">
+    <div>
+        <p class="eyebrow">Resumen general de la óptica</p>
+        <h1>Buen día, Francisco</h1>
+        <p class="date-line">@Model.Today</p>
+    </div>
+    <a class="primary-button" asp-controller="Home" asp-action="Module" asp-route-module="ventas"><span aria-hidden="true">＋</span> Nueva venta</a>
+</section>
+
+<section class="metric-grid" aria-label="Indicadores del día">
+    @foreach (var metric in Model.Metrics)
+    {
+        <article class="metric-card accent-@metric.Accent">
+            <div class="metric-top"><span>@metric.Label</span><span class="metric-icon" aria-hidden="true">@metric.Icon</span></div>
+            <strong class="metric-value">@metric.Value</strong>
+            <span class="metric-detail">@metric.Detail</span>
+        </article>
+    }
+</section>
+
+<section class="dashboard-grid">
+    <div class="panel appointments-panel">
+        <div class="panel-heading">
+            <div><h2>Próximas citas</h2><p>Agenda de hoy</p></div>
+            <a class="secondary-button" asp-controller="Home" asp-action="Module" asp-route-module="citas">Ver agenda <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Hora</th><th>Cliente</th><th>Teléfono</th><th>Estado</th></tr></thead>
+                <tbody>
+                    @foreach (var appointment in Model.Appointments)
+                    {
+                        <tr>
+                            <td class="time-cell">@appointment.Time</td>
+                            <td>@appointment.Client</td>
+                            <td class="muted-cell">@appointment.Phone</td>
+                            <td><span class="status-pill @appointment.Status.ToLowerInvariant()">@appointment.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-foot">3 registros <span>·</span> Página 1 de 1</div>
+    </div>
+
+    <div class="panel stock-panel">
+        <div class="panel-heading stock-heading"><div><h2>Pocas existencias</h2><p>Mínimo recomendado: 5 unidades</p></div></div>
+        <ul class="stock-list">
+            @foreach (var product in Model.LowStock)
+            {
+                <li><span>@product.Product</span><strong>@product.Units unidades</strong></li>
+            }
+        </ul>
+        <a class="secondary-button stock-link" asp-controller="Home" asp-action="Module" asp-route-module="inventario">Ir al inventario <span aria-hidden="true">→</span></a>
+    </div>
+</section>

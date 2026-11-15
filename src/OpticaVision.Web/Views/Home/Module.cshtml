@@ -1,0 +1,62 @@
+@model ModulePageViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["ActivePage"] = Model.Key;
+}
+
+<section class="module-intro">
+    <div>
+        <p class="eyebrow">Gestión administrativa</p>
+        <h1>@Model.Title</h1>
+        <p class="date-line">@Model.Description</p>
+    </div>
+    <button class="primary-button" type="button" disabled title="Se habilitará cuando se conecte la base de datos">＋ @Model.ActionLabel</button>
+</section>
+
+<section class="panel list-panel">
+    <div class="list-toolbar">
+        <label class="search-box"><span aria-hidden="true">⌕</span><input type="search" placeholder="Buscar en @Model.Title.ToLowerInvariant()" aria-label="Buscar en @Model.Title" /></label>
+        <span class="record-count">@Model.Rows.Count registros</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr>@foreach (var column in Model.Columns){<th>@column</th>}</tr></thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        @for (var index = 0; index < row.Count; index++)
+                        {
+                            var value = row[index];
+                            var last = index == row.Count - 1;
+                            <td>
+                                @if (last && (value is "Pendiente" or "Confirmada" or "Borrador" or "Reponer" or "Activo"))
+                                {
+                                    <span class="status-pill @value.ToLowerInvariant()">@value</span>
+                                }
+                                else { @value }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-foot">Página 1 de 1 <span>·</span> Datos de demostración</div>
+</section>
+
+<section class="notice-panel">
+    <span class="notice-icon" aria-hidden="true">ⓘ</span>
+    <div><strong>Alcance de esta vista</strong><p>Esta pantalla muestra el diseño y los flujos previstos. Los registros son ficticios; las operaciones se habilitarán al integrar usuarios, permisos y PostgreSQL.</p></div>
+</section>
+
+@section Scripts {
+    <script>
+        document.querySelector('.search-box input')?.addEventListener('input', (event) => {
+            const term = event.target.value.toLocaleLowerCase('es');
+            document.querySelectorAll('tbody tr').forEach((row) => {
+                row.hidden = !row.innerText.toLocaleLowerCase('es').includes(term);
+            });
+        });
+    </script>
+}

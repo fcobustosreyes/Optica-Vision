@@ -2,10 +2,9 @@
 
 ## Instalacion
 
-1. Abra SQL Editor en su proyecto Supabase.
-2. Pegue el contenido completo de `optica_vision.sql` y ejecutelo una sola vez.
-3. Las 19 tablas se crean en el esquema `optica`, no en `public`.
-4. El script incluye roles, categorias y una bodega inicial. No incluye personas, contrasenas ni transacciones de ejemplo.
+`optica_vision.sql` es un script inicial para una base PostgreSQL vacía. **No lo ejecute en el proyecto Supabase amyjnztkqlxobpbreslj:** ese proyecto ya tiene el esquema `optica`, tablas y datos. Ejecutarlo allí fallaría al crear objetos existentes y no es una migración.
+
+La inspección disponible del proyecto Supabase encontró 20 tablas y 4 vistas. Sus roles actuales son anteriores al diseño acordado. Para actualizarlo se requiere una migración revisada que conserve identificadores, perfiles, operaciones e historial; esta migración todavía no se ha aplicado. El script inicial crea 20 tablas y los cinco roles acordados (`superadministrador`, `administrador`, `ventas`, `recepcion` y `cliente`), además de categorías y una bodega inicial. No crea cuentas, contraseñas ni transacciones reales.
 
 La instalacion es transaccional: un error revierte la instalacion completa. No vuelva a ejecutar el archivo sobre el esquema existente; no es una migracion ni borra tablas anteriores.
 
@@ -13,11 +12,19 @@ La instalacion es transaccional: un error revierte la instalacion completa. No v
 
 Esta entrega es la base de datos comercial para una aplicacion ASP.NET Core que se conecta desde su servidor. El esquema no concede acceso al navegador ni expone funciones publicas. No configure el esquema como expuesto en la API de Supabase sin definir primero permisos y politicas RLS.
 
-`perfiles` identifica a empleados y su rol comercial. No implementa inicio de sesion ni guarda contrasenas. Falta elegir con el equipo entre ASP.NET Core Identity y Supabase Auth. Si usan Supabase Auth, el identificador de perfil puede ser el UUID de `auth.users` y se debe agregar su relacion al integrar la autenticacion.
+`perfiles` identifica a usuarios y su rol dentro de la óptica. No guarda contraseñas ni implementa por sí solo el inicio de sesión. La aplicación ASP.NET Core deberá integrar un proveedor de identidad antes de guardar datos reales. La interfaz actual es una vista demostrativa y todavía no está conectada a Supabase.
 
-La tabla `roles` no equivale a roles del servidor PostgreSQL. El backend debe autenticar al empleado, comprobar permisos por operacion, verificar que este activo y asignar su identificador como responsable. Los campos de responsables no verifican automaticamente quien hizo la peticion. Para anulaciones, los movimientos conservan el responsable original del documento; una auditoria del usuario que anula requiere ampliar esta version.
+La tabla `roles` no equivale a roles del servidor PostgreSQL. El backend debe autenticar al usuario, comprobar el rol, la empresa y los permisos de cada operación, verificar que esté activo y asignar su identificador como responsable. Los campos de responsables no verifican automáticamente quién hizo la petición. Para anulaciones, los movimientos conservan el responsable original del documento; una auditoría del usuario que anula requiere ampliar esta versión.
 
-Antes de conectar la aplicacion, crear un usuario PostgreSQL propio para el servidor y concederle solo los permisos necesarios sobre este esquema. No usar la cuenta propietaria ni una clave de servicio en el navegador. La configuracion de permisos y autenticacion queda pendiente hasta elegir el mecanismo de acceso.
+Los roles de aplicación son: superadministrador de plataforma, administrador de óptica, ventas, recepción y cliente. El superadministrador no obtiene acceso ordinario a los datos de las ópticas. La versión actual del esquema no incluye aislamiento entre varias empresas; antes de ofrecer una instalación compartida se debe incorporar y verificar el aislamiento por empresa. Cada consulta y escritura deberá quedar limitada al tenant del usuario autenticado.
+
+Antes de conectar la aplicación, crear un usuario PostgreSQL propio para el servidor y concederle solo los permisos necesarios sobre este esquema. No usar la cuenta propietaria ni una clave de servicio en el navegador. Guardar las credenciales solo como secretos del servidor (por ejemplo, User Secrets en desarrollo y variables seguras en producción), nunca en archivos versionados o código enviado al cliente. La configuración de permisos y autenticación queda pendiente.
+
+## CRUD y política de bajas
+
+El CRUD de la aplicación permite crear, consultar, actualizar y **desactivar** registros. No se borrarán definitivamente usuarios, clientes, productos, proveedores, categorías, marcas ni bodegas desde la operación normal. La desactivación conserva el registro y su historial; solo usuarios autorizados pueden reactivarlo. Las citas se cancelan; las ventas, compras y recepciones se anulan con sus movimientos y pagos históricos conservados. Los detalles y movimientos confirmados no se eliminan. Configure el usuario PostgreSQL del backend sin permiso ordinario `DELETE`.
+
+Una solicitud legal de cancelación o supresión de datos personales se atiende mediante un procedimiento separado, revisando identidad y obligaciones de conservación; no mediante borrado rutinario.
 
 ## Flujo comercial
 
@@ -36,6 +43,7 @@ UPDATE optica.ventas SET estado = 'confirmada' WHERE id = 1;
 - El precio de venta se guarda en el detalle: la aplicacion debe copiar el precio del producto al agregarlo.
 - Para anular use `estado = 'anulada'`. Una recepcion confirmada solo puede anularse si existe stock suficiente para retirar lo recibido.
 - No hay transicion de anulada a confirmada. Cree un documento nuevo si necesita repetir una operacion.
+- No elimine documentos, pagos ni movimientos: use los estados de anulacion/cancelacion disponibles.
 - Una compra no se anula mientras tenga recepciones confirmadas.
 - Las ventas anuladas conservan los pagos historicos; no representan ingresos vigentes. El reporte debe filtrar por ventas confirmadas. No hay procesamiento de reembolsos bancarios.
 - Anulacion completa no equivale a devolucion parcial: devoluciones y notas de credito quedan fuera de esta version.

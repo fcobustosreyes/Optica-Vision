@@ -1,0 +1,13 @@
+# Visual Studio and local IDE state
+.vs/
+*.user
+*.suo
+
+# .NET build output
+**/bin/
+**/obj/
+
+# Local secrets and environment configuration
+**/appsettings.Local.json
+**/.env
+**/.env.*

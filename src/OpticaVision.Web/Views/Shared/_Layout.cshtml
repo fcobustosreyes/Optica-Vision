@@ -1,0 +1,72 @@
+@{
+    var activePage = ViewData["ActivePage"]?.ToString() ?? "inicio";
+    var navigation = new[]
+    {
+        ("inicio", "Inicio", "⌂", "Index"),
+        ("citas", "Citas", "◷", "Module"),
+        ("ventas", "Ventas", "▤", "Module"),
+        ("compras", "Compras", "▧", "Module"),
+        ("inventario", "Inventario", "◇", "Module"),
+        ("clientes", "Clientes", "♧", "Module"),
+        ("proveedores", "Proveedores", "▣", "Module"),
+        ("reportes", "Reportes", "▥", "Module")
+    };
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173e61" />
+    <title>@ViewData["Title"] · Óptica Visión</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+            <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Óptica Visión, inicio">
+                <span class="brand-mark">OV</span>
+                <span class="brand-name">Óptica Visión</span>
+            </a>
+            <p class="sidebar-caption">Gestión administrativa</p>
+            <nav class="main-nav">
+                @foreach (var item in navigation)
+                {
+                    var current = activePage == item.Item1;
+                    if (item.Item1 == "inicio")
+                    {
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Index" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="nav-link @(current ? "active" : "")" asp-controller="Home" asp-action="Module" asp-route-module="@item.Item1" aria-current="@(current ? "page" : null)">
+                            <span class="nav-icon" aria-hidden="true">@item.Item3</span><span>@item.Item2</span>
+                        </a>
+                    }
+                }
+            </nav>
+            <div class="sidebar-footer"><span class="status-dot"></span> Sistema de gestión</div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">☰</button>
+                <div class="topbar-title">@ViewData["Title"]</div>
+                <div class="user-menu" aria-label="Usuario actual">
+                    <span class="avatar" aria-hidden="true">FB</span>
+                    <span class="user-copy"><strong>Francisco Bustos</strong><small>Administrador</small></span>
+                </div>
+            </header>
+            <main class="content" id="mainContent">
+                @RenderBody()
+                <p class="demo-note"><span aria-hidden="true">ⓘ</span> Vista inicial con datos demostrativos. No usar con datos reales hasta activar autenticación, permisos y conexión segura a la base de datos.</p>
+            </main>
+        </div>
+    </div>
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
