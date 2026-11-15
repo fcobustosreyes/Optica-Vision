@@ -8,7 +8,7 @@
 @if(Model.Padre.HasValue){<p>Documento interno n.º @Model.Padre</p>}
 </div>
 <div class="button-row">
-@if(r.Tabla=="atenciones_servicio" && (User.IsInRole("superadministrador") || User.IsInRole("administrador"))){<a class="secondary-button" asp-action="Index" asp-route-tipo="servicios">Catálogo de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="oftalmologos">Oftalmólogos</a>}
+@if(r.Tabla=="atenciones_servicio" && (User.IsInRole("superadministrador") || User.IsInRole("administrador"))){<a class="secondary-button" asp-action="Index" asp-route-tipo="servicios">Catálogo de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="categorias_servicio">Categorías de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="oftalmologos">Oftalmólogos</a>}
 @if(r.Padre is not null){<a class="secondary-button" asp-action="Index" asp-route-tipo="@r.Padre">Volver a documentos</a>}
 @if(Model.Editable && r.Tabla!="detalle_conteos"){<a class="primary-button" asp-action="Formulario" asp-route-tipo="@r.Tabla" asp-route-padre="@Model.Padre">Agregar registro</a>}
 </div></section>
@@ -43,6 +43,7 @@
 @section Scripts {
 <script>document.querySelector('#buscar').addEventListener('input',function(){for(const row of document.querySelectorAll('tbody tr'))row.hidden=!row.textContent.toLowerCase().includes(this.value.trim().toLowerCase());});</script>
 }
+
 
 
 

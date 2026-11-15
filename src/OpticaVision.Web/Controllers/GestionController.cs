@@ -15,7 +15,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
     private RecursoGestion? Resolver(string tipo)
     {
         if (!RecursosGestion.Todos.TryGetValue(tipo, out var r)) return null;
-        if(tipo is "servicios" or "oftalmologos" && !(User.IsInRole("superadministrador") || User.IsInRole("administrador"))) return null;
+        if(tipo is "servicios" or "oftalmologos" or "categorias_servicio" && !(User.IsInRole("superadministrador") || User.IsInRole("administrador"))) return null;
         if (User.IsInRole("superadministrador") || User.IsInRole("administrador")) return r;
         return r.Modulo switch {
             "servicios" when User.IsInRole("recepcion") || User.IsInRole("ventas") => r,
@@ -229,6 +229,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         return RedirectToAction(nameof(Index),new {tipo,padre});
     }
 }
+
 
 
 

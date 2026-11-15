@@ -20,8 +20,10 @@ public static class RecursosGestion
     {
         new("oftalmologos","Oftalmólogos","servicios",[
             new("codigo","Código",Maximo:30),new("nombre","Nombre completo","nombre"),new("telefono","Teléfono","tel",false,30)]),
+        new("categorias_servicio","Categorías de servicios","servicios",[new("nombre","Categoría","nombre",Maximo:100)]),
         new("servicios","Catálogo de servicios","servicios",[
             new("codigo","Código",Maximo:30),new("nombre","Servicio","nombre",Maximo:120),
+            Selector("categoria_id","Categoría","select id,nombre from optica.categorias_servicio where activo order by nombre"),
             new("precio","Precio (C$)","numeric"),new("descripcion","Descripción",Obligatorio:false,Maximo:500)]),
         new("atenciones_servicio","Atenciones y exámenes","servicios",[
             Selector("cliente_id","Cliente","select id,nombres || ' ' || apellidos from optica.clientes where activo order by apellidos,nombres"),
@@ -83,6 +85,7 @@ public sealed class GestionPagina(RecursoGestion recurso, long? padre)
     public Dictionary<string,Dictionary<string,string>> Etiquetas { get; } = [];
     public List<RegistroGestion> Filas { get; } = [];
 }
+
 
 
 
