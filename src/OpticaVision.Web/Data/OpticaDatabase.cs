@@ -15,7 +15,6 @@ public sealed class OpticaDatabase : IDisposable
         var settings = new NpgsqlConnectionStringBuilder(connectionString)
         {
             SslMode = SslMode.VerifyFull,
-            TrustServerCertificate = false,
             Pooling = true,
             MaxPoolSize = 10,
             Timeout = 15,

@@ -13,7 +13,6 @@ if (!string.IsNullOrWhiteSpace(postgresConnection))
     var postgresSettings = new Npgsql.NpgsqlConnectionStringBuilder(postgresConnection)
     {
         SslMode = Npgsql.SslMode.VerifyFull,
-        TrustServerCertificate = false,
         Pooling = true,
         MaxPoolSize = 10,
         Timeout = 15,
@@ -80,6 +79,62 @@ app.Use(async (context, next) =>
     await next();
 });
 app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/diagnostico/conexion", async (
+        IServiceProvider services,
+        ILogger<Program> logger,
+        CancellationToken cancellationToken) =>
+    {
+        var factory = services.GetService<IDbContextFactory<OpticaDbContext>>();
+        if (factory is null)
+        {
+            return Results.Problem(
+                title: "Conexión no configurada",
+                detail: "Agrega ConnectionStrings:OpticaPostgres a User Secrets y vuelve a iniciar la aplicación.",
+                statusCode: StatusCodes.Status503ServiceUnavailable);
+        }
+
+        try
+        {
+            await using var db = await factory.CreateDbContextAsync(cancellationToken);
+            var connection = db.Database.GetDbConnection();
+            await connection.OpenAsync(cancellationToken);
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT 1, to_regclass('optica.clientes') IS NOT NULL;";
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            await reader.ReadAsync(cancellationToken);
+
+            var esquemaDisponible = reader.GetBoolean(1);
+            if (!esquemaDisponible)
+            {
+                return Results.Problem(
+                    title: "PostgreSQL conectado; esquema pendiente",
+                    detail: "La conexión funciona, pero no se encontró la tabla optica.clientes.",
+                    statusCode: StatusCodes.Status503ServiceUnavailable);
+            }
+
+            return Results.Ok(new
+            {
+                estado = "Conectada",
+                mensaje = "La aplicación se conectó a PostgreSQL y encontró el esquema de Óptica Visión."
+            });
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Falló la comprobación local de la conexión PostgreSQL.");
+            return Results.Problem(
+                title: "No se pudo conectar",
+                detail: "Revisa los datos de conexión y la disponibilidad del proyecto Supabase. El detalle quedó en el registro local del servidor.",
+                statusCode: StatusCodes.Status503ServiceUnavailable);
+        }
+    });
+}
 
 app.MapStaticAssets();
 app.MapControllers();

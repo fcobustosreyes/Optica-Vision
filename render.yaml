@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: optica-vision
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /cuenta/iniciar-sesion
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+        value: "true"
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__OpticaPostgres
+        sync: false
+      - key: Supabase__SecretKey
+        sync: false
+      - key: Bootstrap__Token
+        sync: false
