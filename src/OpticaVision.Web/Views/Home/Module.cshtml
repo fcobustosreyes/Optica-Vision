@@ -3,7 +3,8 @@
     var gestor = User.IsInRole("superadministrador") || User.IsInRole("administrador");
     var destinos = Model.Key switch {
         "inventario" when gestor || User.IsInRole("bodega") => new[]{"productos","categorias","marcas","bodegas","conteos_inventario"},
-        "compras" or "ventas" or "proveedores" => new[]{Model.Key},
+        "compras" => new[]{"ordenes_compra","compras"},
+        "ventas" or "proveedores" => new[]{Model.Key},
         "reportes" => new[]{"ventas","compras"},
         _ => Array.Empty<string>()
     };
@@ -80,6 +81,7 @@
         });
     </script>
 }
+
 
 
 

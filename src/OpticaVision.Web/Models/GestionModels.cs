@@ -44,6 +44,12 @@ public static class RecursosGestion
         new("categorias","Categorías","inventario",[new("nombre","Nombre","nombre",Maximo:80)]),
         new("marcas","Marcas","inventario",[new("nombre","Nombre","nombre",Maximo:80)]),
         new("bodegas","Bodegas","inventario",[new("nombre","Nombre","nombre",Maximo:80),new("ubicacion","Ubicación",Obligatorio:false)]),
+        new("ordenes_compra","Órdenes de compra","compras",[
+            new("numero","Número de orden","autonumero",false),
+            Selector("proveedor_id","Proveedor","select id,nombre from optica.proveedores where activo order by nombre"),
+            new("observaciones","Observaciones",Obligatorio:false,Maximo:500)],"creado_por"),
+        new("detalle_ordenes_compra","Productos de la orden","compras",[
+            Selector("producto_id","Producto",Productos),new("cantidad","Cantidad","positivo"),new("costo_unitario","Costo unitario (C$)","numeric")],Padre:"ordenes_compra",ClavePadre:"orden_id"),
         new("compras","Compras","compras",[
             Selector("proveedor_id","Proveedor","select id,nombre from optica.proveedores where activo order by nombre"),
             new("numero_documento_proveedor","Factura del proveedor",Maximo:80),
@@ -85,6 +91,8 @@ public sealed class GestionPagina(RecursoGestion recurso, long? padre)
     public Dictionary<string,Dictionary<string,string>> Etiquetas { get; } = [];
     public List<RegistroGestion> Filas { get; } = [];
 }
+
+
 
 
 

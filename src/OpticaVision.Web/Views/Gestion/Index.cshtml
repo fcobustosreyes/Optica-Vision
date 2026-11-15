@@ -8,7 +8,7 @@
 @if(Model.Padre.HasValue){<p>Documento interno n.º @Model.Padre</p>}
 </div>
 <div class="button-row">
-@if(r.Tabla=="atenciones_servicio" && (User.IsInRole("superadministrador") || User.IsInRole("administrador"))){<a class="secondary-button" asp-action="Index" asp-route-tipo="servicios">Catálogo de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="categorias_servicio">Categorías de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="oftalmologos">Oftalmólogos</a>}
+@if(r.Modulo=="servicios" && (User.IsInRole("superadministrador") || User.IsInRole("administrador"))){<a class="secondary-button" asp-action="Index" asp-route-tipo="atenciones_servicio">Atenciones realizadas</a><a class="secondary-button" asp-action="Index" asp-route-tipo="servicios">Catálogo de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="categorias_servicio">Categorías de servicios</a><a class="secondary-button" asp-action="Index" asp-route-tipo="oftalmologos">Oftalmólogos</a>}
 @if(r.Padre is not null){<a class="secondary-button" asp-action="Index" asp-route-tipo="@r.Padre">Volver a documentos</a>}
 @if(Model.Editable && r.Tabla!="detalle_conteos"){<a class="primary-button" asp-action="Formulario" asp-route-tipo="@r.Tabla" asp-route-padre="@Model.Padre">Agregar registro</a>}
 </div></section>
@@ -27,6 +27,8 @@
 <td>@(r.Padre is null ? fila.Estado : Model.Editable ? "Borrador" : "Cerrado")</td><td><div class="button-row">
 @if(r.Tabla!="atenciones_servicio" && Model.Editable && (!r.EsDocumento || fila.Estado is "borrador" or "abierto")){
 <a asp-action="Formulario" asp-route-tipo="@r.Tabla" asp-route-id="@fila.Id" asp-route-padre="@Model.Padre">Editar</a>}
+@if(r.Tabla is "ventas" or "compras" or "ordenes_compra"){
+<a asp-controller="Documentos" asp-action="Ver" asp-route-tipo="@r.Tabla" asp-route-id="@fila.Id">Imprimir o guardar PDF</a>}
 @foreach(var detalle in RecursosGestion.Todos.Values.Where(x=>x.Padre==r.Tabla)){
 <a asp-action="Index" asp-route-tipo="@detalle.Tabla" asp-route-padre="@fila.Id">@detalle.Titulo</a>}
 @{
@@ -43,6 +45,8 @@
 @section Scripts {
 <script>document.querySelector('#buscar').addEventListener('input',function(){for(const row of document.querySelectorAll('tbody tr'))row.hidden=!row.textContent.toLowerCase().includes(this.value.trim().toLowerCase());});</script>
 }
+
+
 
 
 

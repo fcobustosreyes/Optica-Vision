@@ -12,7 +12,8 @@
 @foreach(var f in r.Campos){
     var valor=Model.Valores.GetValueOrDefault(f.Columna);
     <div class="field"><label for="@f.Columna">@f.Etiqueta</label>
-    @if((r.Tabla=="detalle_conteos" && f.Columna is "producto_id" or "cantidad_sistema") || (r.Tabla=="conteos_inventario" && Model.Id.HasValue && f.Columna=="bodega_id")){
+    @if(f.Tipo=="autonumero"){<span>@(valor ?? "Se asignará al guardar")</span>
+    }else if((r.Tabla=="detalle_conteos" && f.Columna is "producto_id" or "cantidad_sistema") || (r.Tabla=="conteos_inventario" && Model.Id.HasValue && f.Columna=="bodega_id")){
         <span>@(Model.Opciones.GetValueOrDefault(f.Columna)?.GetValueOrDefault(valor ?? "") ?? valor)</span>
     }else if(f.Tipo=="metodo"){
         <input value="Efectivo" readonly aria-readonly="true" />
@@ -88,6 +89,7 @@
 </script>
 }
 }
+
 
 
 

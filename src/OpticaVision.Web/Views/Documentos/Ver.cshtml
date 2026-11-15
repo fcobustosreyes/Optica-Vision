@@ -1,0 +1,18 @@
+@model OpticaVision.Web.Controllers.DocumentoImpresion
+@{Layout=null;}
+<!doctype html><html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>@Model.Titulo @Model.Numero</title>
+<style>
+body{font:14px Arial,sans-serif;color:#172b3a;max-width:900px;margin:35px auto;padding:24px}h1{font-size:26px}header{border-bottom:2px solid #173e61;padding-bottom:20px}table{width:100%;border-collapse:collapse;margin:25px 0}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}td:nth-child(n+3),th:nth-child(n+3){text-align:right}.total{text-align:right;font-size:18px}.acciones{display:flex;gap:16px;margin-bottom:24px}button,a{padding:10px}.estado{font-weight:bold;text-transform:uppercase}tr{break-inside:avoid}thead{display:table-header-group}@@page{size:Letter;margin:18mm}@@media print{.acciones{display:none}body{padding:0;margin:0;max-width:none}}
+</style></head><body>
+<div class="acciones"><button onclick="window.print()">Imprimir o guardar en PDF</button><button onclick="window.close()">Cerrar</button></div>
+<header><strong>Óptica Visión</strong><h1>@Model.Titulo</h1><p>Número @Model.Numero</p><p>Fecha @Model.Fecha · Nicaragua</p><p class="estado">@Model.Estado</p></header>
+<p><strong>@(Model.Venta?"Cliente":"Proveedor")</strong> @Model.Persona</p>
+@if(Model.Factura!=""){<p>Factura del proveedor @Model.Factura</p>}
+@if(Model.Poliza!=""){<p>Póliza @Model.Poliza</p>}
+<table><thead><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Precio C$</th><th>Descuento unitario C$</th><th>Subtotal C$</th></tr></thead><tbody>
+@foreach(var l in Model.Lineas){<tr><td>@l.Codigo</td><td>@l.Producto</td><td>@l.Cantidad</td><td>@l.Precio.ToString("N2")</td><td>@l.Descuento.ToString("N2")</td><td>@l.Subtotal.ToString("N2")</td></tr>}
+</tbody></table><p class="total"><strong>Total C$ @Model.Total.ToString("N2")</strong></p>
+@if(Model.Venta){<p class="total">Pagado C$ @Model.Pagado.ToString("N2")</p><p class="total">Pendiente C$ @Math.Max(Model.Total-Model.Pagado,0).ToString("N2")</p>}
+@if(Model.Estado=="borrador"){<p>Documento en preparación.</p>}
+<p>Comprobante interno de Óptica Visión.</p>
+</body></html>

@@ -134,6 +134,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         if(tipo=="atenciones_servicio" && id.HasValue) return Conflict("La atención cobrada se conserva. Desactívala si corresponde y registra la corrección.");
         foreach(var f in r.Campos)
         {
+            if(f.Tipo=="autonumero") continue;
             if(tipo=="detalle_conteos" && f.Columna is "producto_id" or "cantidad_sistema") continue;
             if(tipo=="conteos_inventario" && id.HasValue && f.Columna=="bodega_id") continue;
             if(tipo=="atenciones_servicio" && f.Columna=="precio")
@@ -229,6 +230,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         return RedirectToAction(nameof(Index),new {tipo,padre});
     }
 }
+
 
 
 
