@@ -35,10 +35,10 @@ public sealed class ConsultasOperativas(OpticaDatabase database)
                        coalesce(nullif(concat_ws(' ', c.nombres,c.apellidos),''),'Consumidor final'), v.total::text, v.pagado::text, initcap(v.estado)
                 FROM optica.resumen_ventas v LEFT JOIN optica.clientes c ON c.id=v.cliente_id ORDER BY v.fecha DESC, v.id DESC
                 """),
-            "compras" => ("Compras", "Consulta las compras por proveedor y documento.", ["N.º interno", "Fecha", "Proveedor", "Factura o póliza", "Total (C$)", "Estado"],
+            "compras" => ("Compras", "Consulta las compras por proveedor y documento.", ["N.º interno", "Fecha", "Proveedor", "Factura del proveedor", "Número de póliza", "Total (C$)", "Estado"],
                 """
                 SELECT c.id::text, to_char(c.fecha AT TIME ZONE 'America/Managua','DD/MM/YYYY'), p.nombre,
-                       c.numero_documento_proveedor, c.total::text, initcap(c.estado)
+                       c.numero_documento_proveedor, (select numero_poliza from optica.compras where id=c.id), c.total::text, initcap(c.estado)
                 FROM optica.resumen_compras c JOIN optica.proveedores p ON p.id=c.proveedor_id ORDER BY c.fecha DESC,c.id DESC
                 """),
             "inventario" => ("Inventario", "Consulta existencias y mínimos de reposición por bodega.", ["Bodega", "Código", "Producto", "Unidades", "Mínimo", "Estado"],
@@ -69,5 +69,6 @@ public sealed class ConsultasOperativas(OpticaDatabase database)
         };
     }
 }
+
 
 

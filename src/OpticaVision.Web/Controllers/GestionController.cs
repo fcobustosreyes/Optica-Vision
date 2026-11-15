@@ -15,8 +15,10 @@ public sealed class GestionController(OpticaDatabase db) : Controller
     private RecursoGestion? Resolver(string tipo)
     {
         if (!RecursosGestion.Todos.TryGetValue(tipo, out var r)) return null;
+        if(tipo is "servicios" or "oftalmologos" && !(User.IsInRole("superadministrador") || User.IsInRole("administrador"))) return null;
         if (User.IsInRole("superadministrador") || User.IsInRole("administrador")) return r;
         return r.Modulo switch {
+            "servicios" when User.IsInRole("recepcion") || User.IsInRole("ventas") => r,
             "ventas" when User.IsInRole("ventas") => r,
             "inventario" or "recepciones" when User.IsInRole("bodega") => r,
             _ => null
@@ -48,6 +50,27 @@ public sealed class GestionController(OpticaDatabase db) : Controller
             while (await rd.ReadAsync(ct)) lista[rd.GetInt64(0).ToString()] = rd.GetString(1);
             pagina.Opciones[f.Columna] = lista;
         }
+        if (r.Tabla=="pagos_venta")
+        {
+            await using var saldo= new NpgsqlCommand("select greatest(total-pagado+coalesce((select monto from optica.pagos_venta where id=@id and venta_id=@padre),0),0) from optica.resumen_ventas where id=@padre",cn);
+            saldo.Parameters.AddWithValue("id",id ?? 0);
+            saldo.Parameters.AddWithValue("padre",padre ?? 0);
+            pagina.Valores["monto"] = Convert.ToString(await saldo.ExecuteScalarAsync(ct),CultureInfo.InvariantCulture) ?? "0";
+        }
+        foreach(var referencia in new[] {
+            ("cliente_id","select id,nombres || ' ' || apellidos from optica.clientes"),
+            ("bodega_id","select id,nombre from optica.bodegas"),
+            ("producto_id","select id,codigo || ' · ' || nombre from optica.productos"),
+            ("proveedor_id","select id,nombre from optica.proveedores")
+        })
+        {
+            if(!r.Campos.Any(f=>f.Columna==referencia.Item1)) continue;
+            await using var etiquetas=new NpgsqlCommand(referencia.Item2,cn);
+            await using var lector=await etiquetas.ExecuteReaderAsync(ct);
+            var nombres=new Dictionary<string,string>();
+            while(await lector.ReadAsync(ct)) nombres[lector.GetInt64(0).ToString()]=lector.GetString(1);
+            pagina.Etiquetas[referencia.Item1]=nombres;
+        }
         var columnas = string.Join(",",r.Campos.Select(f=>$"{f.Columna}::text"));
         var seleccion = id.HasValue ? " and id=@id" : "";
         await using var cmd = new NpgsqlCommand($"select id,{Estado(r)},{columnas} from optica.{r.Tabla} where {Filtro(r)}{seleccion} order by id desc",cn);
@@ -60,7 +83,9 @@ public sealed class GestionController(OpticaDatabase db) : Controller
             pagina.Filas.Add(new(reader.GetInt64(0),reader.GetString(1),valores));
             if (id.HasValue)
             {
+                var montoCalculado=pagina.Valores.GetValueOrDefault("monto");
                 pagina.Valores = r.Campos.Select((f,i)=>(f.Columna,Valor:valores[i])).ToDictionary(x=>x.Columna,x=>x.Valor);
+                if(montoCalculado is not null) pagina.Valores["monto"]=montoCalculado;
                 if (r.EsDocumento) pagina.Editable = reader.GetString(1) is "borrador" or "abierto";
             }
         }
@@ -106,10 +131,29 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         var campos = new List<string>();
         var expresiones = new List<string>();
         await using var cmd = db.DataSource.CreateCommand();
+        if(tipo=="atenciones_servicio" && id.HasValue) return Conflict("La atención cobrada se conserva. Desactívala si corresponde y registra la corrección.");
         foreach(var f in r.Campos)
         {
             if(tipo=="detalle_conteos" && f.Columna is "producto_id" or "cantidad_sistema") continue;
             if(tipo=="conteos_inventario" && id.HasValue && f.Columna=="bodega_id") continue;
+            if(tipo=="atenciones_servicio" && f.Columna=="precio")
+            {
+                campos.Add(f.Columna);
+                expresiones.Add("(select precio from optica.servicios where id=nullif(@servicio_id,'')::bigint and activo)");
+                continue;
+            }
+            if(tipo=="detalle_ventas" && f.Columna=="precio_unitario")
+            {
+                campos.Add(f.Columna);
+                expresiones.Add("(select case when d.producto_id=p.id then d.precio_unitario else p.precio_venta end from optica.productos p left join optica.detalle_ventas d on d.id=@id and d.venta_id=@padre where p.id=nullif(@producto_id,'')::bigint and p.activo)");
+                continue;
+            }
+            if(tipo=="pagos_venta" && f.Columna=="monto")
+            {
+                campos.Add(f.Columna);
+                expresiones.Add("(select greatest(total-pagado+coalesce((select monto from optica.pagos_venta where id=@id and venta_id=@padre),0),0) from optica.resumen_ventas where id=@padre)");
+                continue;
+            }
             string v = valores.GetValueOrDefault(f.Columna)?.Trim() ?? "";
             p.Valores[f.Columna]=v;
             bool valido = v.Length==0 ? !f.Obligatorio : Valido(f,v) &&
@@ -185,5 +229,10 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         return RedirectToAction(nameof(Index),new {tipo,padre});
     }
 }
+
+
+
+
+
 
 

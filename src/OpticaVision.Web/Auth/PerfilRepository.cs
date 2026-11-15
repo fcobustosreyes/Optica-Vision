@@ -144,7 +144,7 @@ public sealed class PostgresPerfilRepository(OpticaDatabase database) : IPerfilR
         await using var lockCommand = new NpgsqlCommand(lockSql, connection, transaction);
         lockCommand.Parameters.AddWithValue("id", perfilId);
         var role = await lockCommand.ExecuteScalarAsync(cancellationToken) as string;
-        if (role is null || (!esPropietario && role is not ("recepcion" or "ventas" or "bodega")))
+        if (role is null || (!esPropietario && role is not ("recepcion" or "ventas" or "bodega" or "oftalmologo")))
             return false;
         if (!activo && role == "superadministrador")
         {
@@ -193,4 +193,5 @@ public sealed class PostgresPerfilRepository(OpticaDatabase database) : IPerfilR
 
 public sealed class SetupAlreadyCompletedException : Exception { }
 public sealed class LastSuperadministratorException : Exception { }
+
 

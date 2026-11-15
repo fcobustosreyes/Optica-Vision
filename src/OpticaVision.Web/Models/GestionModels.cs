@@ -18,6 +18,17 @@ public static class RecursosGestion
     private const string Bodegas = "select id,nombre from optica.bodegas where activo order by nombre";
     public static readonly IReadOnlyDictionary<string, RecursoGestion> Todos = new RecursoGestion[]
     {
+        new("oftalmologos","Oftalmólogos","servicios",[
+            new("codigo","Código",Maximo:30),new("nombre","Nombre completo","nombre"),new("telefono","Teléfono","tel",false,30)]),
+        new("servicios","Catálogo de servicios","servicios",[
+            new("codigo","Código",Maximo:30),new("nombre","Servicio","nombre",Maximo:120),
+            new("precio","Precio (C$)","numeric"),new("descripcion","Descripción",Obligatorio:false,Maximo:500)]),
+        new("atenciones_servicio","Atenciones y exámenes","servicios",[
+            Selector("cliente_id","Cliente","select id,nombres || ' ' || apellidos from optica.clientes where activo order by apellidos,nombres"),
+            Selector("servicio_id","Servicio","select id,nombre from optica.servicios where activo order by nombre"),
+            new("precio","Monto del servicio (C$)","numeric"),
+            new("metodo","Método de pago","metodo"),
+            new("referencia","Referencia del pago",Obligatorio:false)]),
         new("proveedores","Proveedores","proveedores", [
             new("nombre","Nombre comercial","nombre"), new("identificacion_fiscal","Identificación fiscal",Obligatorio:false,Maximo:40),
             new("contacto","Contacto",Obligatorio:false), new("telefono","Teléfono","tel",false,30),
@@ -33,7 +44,8 @@ public static class RecursosGestion
         new("bodegas","Bodegas","inventario",[new("nombre","Nombre","nombre",Maximo:80),new("ubicacion","Ubicación",Obligatorio:false)]),
         new("compras","Compras","compras",[
             Selector("proveedor_id","Proveedor","select id,nombre from optica.proveedores where activo order by nombre"),
-            new("numero_documento_proveedor","Factura o póliza del proveedor",Maximo:80),
+            new("numero_documento_proveedor","Factura del proveedor",Maximo:80),
+            new("numero_poliza","Número de póliza",Maximo:80),
             new("observaciones","Observaciones",Obligatorio:false,Maximo:500)],"creado_por"),
         new("ventas","Ventas","ventas",[
             Selector("cliente_id","Cliente","select id,nombres || ' ' || apellidos from optica.clientes where activo order by apellidos,nombres",false),
@@ -68,6 +80,11 @@ public sealed class GestionPagina(RecursoGestion recurso, long? padre)
     public bool Editable { get; set; } = true;
     public Dictionary<string,string> Valores { get; set; } = [];
     public Dictionary<string,Dictionary<string,string>> Opciones { get; } = [];
+    public Dictionary<string,Dictionary<string,string>> Etiquetas { get; } = [];
     public List<RegistroGestion> Filas { get; } = [];
 }
+
+
+
+
 

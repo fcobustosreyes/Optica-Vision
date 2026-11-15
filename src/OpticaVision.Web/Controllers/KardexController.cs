@@ -32,6 +32,7 @@ public sealed class KardexController(OpticaDatabase database) : Controller
                        COALESCE('REC-' || r.id::text, 'VEN-' || v.numero::text,
                                 'CON-' || ci.id::text, 'MOV-' || m.id::text) AS referencia,
                        NULLIF(btrim(compra.numero_documento_proveedor), '') AS documento_compra,
+                       NULLIF(btrim(compra.numero_poliza), '') AS numero_poliza,
                        COALESCE(per.nombre_completo, 'Sistema') AS responsable
                 FROM optica.movimientos_inventario m
                 JOIN optica.bodegas b ON b.id = m.bodega_id
@@ -46,9 +47,9 @@ public sealed class KardexController(OpticaDatabase database) : Controller
                 LEFT JOIN optica.perfiles per ON per.id = m.usuario_id
             )
             SELECT fecha, bodega, codigo_producto, producto, tipo_movimiento,
-                   entrada, salida, saldo, referencia, responsable, documento_compra
+                   entrada, salida, saldo, referencia, responsable, documento_compra, numero_poliza
             FROM historial
-            WHERE @buscar = '' OR concat_ws(' ', bodega, codigo_producto, producto, tipo_movimiento, referencia, documento_compra)
+            WHERE @buscar = '' OR concat_ws(' ', bodega, codigo_producto, producto, tipo_movimiento, referencia, documento_compra, numero_poliza)
                   ILIKE '%' || @buscar || '%'
             ORDER BY fecha DESC
             LIMIT 200;
@@ -65,7 +66,8 @@ public sealed class KardexController(OpticaDatabase database) : Controller
                 new DateTimeOffset(reader.GetDateTime(0)),
                 reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4),
                 reader.GetInt64(5), reader.GetInt64(6), reader.GetInt64(7), reader.GetString(8), reader.GetString(9),
-                reader.IsDBNull(10) ? null : reader.GetString(10)));
+                reader.IsDBNull(10) ? null : reader.GetString(10),
+                reader.IsDBNull(11) ? null : reader.GetString(11)));
         }
 
         ViewData["Title"] = "Kardex";
@@ -79,5 +81,6 @@ public sealed class KardexController(OpticaDatabase database) : Controller
         return View("~/Views/Clientes/DatabaseUnavailable.cshtml");
     }
 }
+
 
 

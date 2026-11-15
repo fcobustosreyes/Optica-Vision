@@ -1,0 +1,15 @@
+@model IReadOnlyList<OpticaVision.Web.Controllers.CitaMedica>
+@{ ViewData["Title"]="Mi agenda"; }
+<section class="module-intro"><div><h1>Mis citas</h1><p>Clientes y servicios asignados a tu cuenta.</p></div></section>
+@if(TempData["Error"] is string error){<p class="validation-summary" role="alert">@error</p>}
+<section class="panel"><div class="table-wrap"><table>
+<thead><tr><th>Fecha y hora</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Atención</th></tr></thead>
+<tbody>
+@foreach(var cita in Model){
+<tr><td>@cita.Fecha.ToString("dd/MM/yyyy HH:mm")</td><td>@cita.Cliente</td><td>@cita.Servicio</td><td>@cita.Estado</td><td>
+@if(cita.Estado is "pendiente" or "confirmada"){
+<form method="post" asp-action="Completar" asp-route-id="@cita.Id"><button class="text-button">Marcar atendida</button></form>
+}</td></tr>
+}
+@if(Model.Count==0){<tr><td colspan="5">Todavía no tienes citas asignadas.</td></tr>}
+</tbody></table></div></section>

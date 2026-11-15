@@ -77,7 +77,7 @@ public sealed class UsuariosController(
         await using var cmd=database.DataSource.CreateCommand("""
             with editado as (
                 update optica.perfiles p set nombre_completo=@nombre from optica.roles r
-                where p.id=@id and r.id=p.rol_id and (@propietario or r.nombre in ('ventas','recepcion','bodega'))
+                where p.id=@id and r.id=p.rol_id and (@propietario or r.nombre in ('ventas','recepcion','bodega','oftalmologo'))
                 returning p.id
             )
             insert into optica.auditoria_eventos(actor_perfil_id,tipo,entidad,detalles)
@@ -123,8 +123,8 @@ public sealed class UsuariosController(
     private void PrepararRoles()
     {
         var roles = User.IsInRole("superadministrador")
-            ? new[] { "superadministrador", "administrador", "ventas", "recepcion", "bodega" }
-            : new[] { "ventas", "recepcion", "bodega" };
+            ? new[] { "superadministrador", "administrador", "ventas", "recepcion", "bodega", "oftalmologo" }
+            : new[] { "ventas", "recepcion", "bodega", "oftalmologo" };
         ViewBag.Roles = roles;
         ViewData["Title"] = "Nuevo usuario";
         ViewData["ActivePage"] = "usuarios";
@@ -133,7 +133,7 @@ public sealed class UsuariosController(
     private bool RolPermitido(string rol) => rol switch
     {
         "superadministrador" or "administrador" => User.IsInRole("superadministrador"),
-        "ventas" or "recepcion" or "bodega" => User.IsInRole("administrador") || User.IsInRole("superadministrador"),
+        "ventas" or "recepcion" or "bodega" or "oftalmologo" => User.IsInRole("administrador") || User.IsInRole("superadministrador"),
         _ => false
     };
 
@@ -150,5 +150,6 @@ public sealed class UsuariosController(
     }
 
 }
+
 
 

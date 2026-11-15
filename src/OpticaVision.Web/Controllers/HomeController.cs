@@ -14,6 +14,7 @@ public class HomeController(ConsultasOperativas consultas) : Controller
 
     public async Task<IActionResult> Index(CancellationToken ct)
     {
+        if(User.IsInRole("oftalmologo")) return RedirectToAction("Index","AgendaMedica");
         var metrics = new List<DashboardMetric>();
         var appointments = new List<AppointmentRow>();
         var stock = new List<LowStockRow>();
@@ -98,5 +99,6 @@ public class HomeController(ConsultasOperativas consultas) : Controller
         _ => false
     };
 }
+
 
 

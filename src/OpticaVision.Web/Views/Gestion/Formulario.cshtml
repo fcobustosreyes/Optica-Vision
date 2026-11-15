@@ -19,6 +19,8 @@
         <select id="@f.Columna" name="valores[@f.Columna]" required="@f.Obligatorio"><option value="">Seleccionar</option>
         @foreach(var opcion in opciones){<option value="@opcion.Key" selected="@(valor==opcion.Key)">@opcion.Value</option>}
         </select>
+    }else if((r.Tabla=="detalle_ventas" && f.Columna=="precio_unitario") || (r.Tabla=="pagos_venta" && f.Columna=="monto") || (r.Tabla=="atenciones_servicio" && f.Columna=="precio")){
+        <input id="@f.Columna" value="@valor" readonly aria-readonly="true" />
     }else{
         var tipo=f.Tipo switch {"email"=>"email","tel"=>"tel","numeric" or "importe" or "int" or "positivo"=>"number",_=>"text"};
         <input id="@f.Columna" name="valores[@f.Columna]" type="@tipo" value="@(valor ?? (f.Columna=="descuento_unitario"?"0":null))" maxlength="@f.Maximo" required="@f.Obligatorio" min="@(f.Tipo=="positivo"?"1":f.Tipo=="importe"?"0.01":"0")" step="@(f.Tipo is "numeric" or "importe"?"0.01":"1")" />
@@ -28,3 +30,59 @@
 <div class="form-actions"><a class="secondary-button" asp-action="Index" asp-route-tipo="@r.Tabla" asp-route-padre="@Model.Padre">Cancelar</a><button class="primary-button">Guardar</button></div>
 </form></section>
 
+
+@if(r.Tabla=="detalle_ventas"){
+<p class="panel-foot">Total del producto <output id="total-linea">C$ 0.00</output></p>
+@section Scripts {
+<script>
+(() => {
+    const producto=document.getElementById('producto_id');
+    const precio=document.getElementById('precio_unitario');
+    const cantidad=document.getElementById('cantidad');
+    const descuento=document.getElementById('descuento_unitario');
+    let solicitud=0;
+    function total(){
+        const importe=Number(cantidad.value)*(Number(precio.value)-Number(descuento.value || 0));
+        document.getElementById('total-linea').textContent=new Intl.NumberFormat('es-NI',{style:'currency',currency:'NIO'}).format(Number.isFinite(importe)?importe:0);
+    }
+    async function cargar(){
+        const actual=++solicitud;
+        precio.value='';
+        if(!producto.value){total();return;}
+        try{
+            const respuesta=await fetch('/ventas/precio/'+encodeURIComponent(producto.value));
+            if(!respuesta.ok) throw new Error();
+            const datos=await respuesta.json();
+            if(actual===solicitud){precio.value=Number(datos.precio).toFixed(2);total();}
+        }catch{if(actual===solicitud)document.getElementById('total-linea').textContent='Selecciona un producto disponible.';}
+    }
+    producto.addEventListener('change',cargar);
+    cantidad.addEventListener('input',total);
+    descuento.addEventListener('input',total);
+    if(producto.value && !precio.value)cargar();else total();
+})();
+</script>
+}
+}
+
+@if(r.Tabla=="atenciones_servicio"){
+@section Scripts{
+<script>
+(() => {
+ const servicio=document.getElementById('servicio_id'),precio=document.getElementById('precio');
+ let version=0;
+ servicio.addEventListener('change',async()=>{
+   const actual=++version;
+   precio.value='';
+   if(!servicio.value)return;
+   try{
+     const respuesta=await fetch('/servicios/precio/'+encodeURIComponent(servicio.value));
+     if(!respuesta.ok)throw new Error();
+     const datos=await respuesta.json();
+     if(actual===version)precio.value=Number(datos.precio).toFixed(2);
+   }catch{if(actual===version)precio.placeholder='Vuelve a seleccionar el servicio';}
+ });
+})();
+</script>
+}
+}

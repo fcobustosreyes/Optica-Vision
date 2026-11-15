@@ -1,0 +1,26 @@
+@model IReadOnlyList<OpticaVision.Web.Controllers.FichaProducto>
+@{ViewData["Title"]="Catálogo de productos";ViewData["ActivePage"]="catalogo";}
+<section class="module-intro"><div><p class="eyebrow">Atención al cliente</p><h1>Catálogo de productos</h1><p>Consulta características, precio y disponibilidad.</p></div></section>
+<form method="get" class="list-toolbar"><label class="search-box">Buscar <input name="buscar" value="@ViewData["Busqueda"]" placeholder="Nombre, código, marca o categoría" /></label><button class="secondary-button">Buscar</button></form>
+<div class="catalogo-grid">
+@foreach(var p in Model){
+    var lentes=p.Nombre.Contains("montura",StringComparison.OrdinalIgnoreCase)||p.Nombre.Contains("lentes de sol",StringComparison.OrdinalIgnoreCase);
+    var sol=p.Nombre.Contains("sol",StringComparison.OrdinalIgnoreCase);
+    var imagen=sol?"https://images.unsplash.com/photo-1650779404204-7fee42a773fc?auto=format&fit=crop&w=700&q=80":"https://images.unsplash.com/photo-1624617928717-e246526c73dc?auto=format&fit=crop&w=700&q=80";
+    var fuente=sol?"https://unsplash.com/photos/a-pair-of-sunglasses-3ZhYTepAMHY":"https://unsplash.com/photos/black-framed-eyeglasses-on-brown-sand-during-daytime-u_Vbtv3Ru_Q";
+    <article class="panel ficha-producto">
+    @if(lentes){
+    <figure><img src="@imagen" alt="Fotografía ilustrativa de lentes" loading="lazy" referrerpolicy="no-referrer" /><figcaption>Imagen ilustrativa · <a href="@fuente" target="_blank" rel="noopener noreferrer">Unsplash</a></figcaption></figure>
+    }else{<div class="producto-sin-foto">Fotografía pendiente</div>}
+    <div class="ficha-contenido"><p class="eyebrow">@p.Categoria · @p.Codigo</p><h2>@p.Nombre</h2>
+    <p class="precio-producto">C$ @p.Precio.ToString("N2")</p>
+    <p>@(p.Stock>0?$"Disponible · {p.Stock} unidades":"Sin existencias")</p>
+    <details><summary>Ver ficha del producto</summary><dl>
+    <dt>Marca</dt><dd>@(p.Marca==""?"Sin marca registrada":p.Marca)</dd>
+    <dt>Modelo</dt><dd>@(p.Modelo==""?"Sin modelo registrado":p.Modelo)</dd>
+    <dt>Color</dt><dd>@(p.Color==""?"Sin color registrado":p.Color)</dd>
+    </dl>@if(p.Descripcion!=""){<p>@p.Descripcion</p>}</details></div>
+    </article>
+}
+</div>
+@if(Model.Count==0){<p>No hay productos que coincidan con la búsqueda.</p>}
