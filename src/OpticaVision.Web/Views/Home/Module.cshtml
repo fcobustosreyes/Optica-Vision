@@ -12,6 +12,11 @@
     </div>
 </section>
 
+@if (Model.Key == "citas")
+{
+    <a class="primary-button" asp-controller="Clientes" asp-action="Index">Elegir cliente para agendar</a>
+    @if (TempData["CitaCreada"] is string mensaje) { <p role="status">@mensaje</p> }
+}
 <section class="panel list-panel">
     <div class="list-toolbar">
         <label class="search-box"><span aria-hidden="true">⌕</span><input type="search" placeholder="Buscar en @Model.Title.ToLowerInvariant()" aria-label="Buscar en @Model.Title" /></label>
@@ -57,4 +62,5 @@
         });
     </script>
 }
+
 

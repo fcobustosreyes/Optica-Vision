@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using OpticaVision.Web.Auth;
@@ -28,6 +29,13 @@ else
 }
 builder.Services.AddScoped<IPerfilRepository, PostgresPerfilRepository>();
 builder.Services.AddScoped<PerfilCookieEvents>();
+builder.Services.AddSingleton<PartitionedRateLimiter<string>>(_ =>
+    PartitionedRateLimiter.Create<string, string>(correo =>
+        RateLimitPartition.GetFixedWindowLimiter(correo, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(10)
+        }), StringComparer.OrdinalIgnoreCase));
 builder.Services.AddHttpClient<ISupabaseAuthClient, SupabaseAuthClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(15);
@@ -147,4 +155,5 @@ app.MapControllerRoute(
 
 
 app.Run();
+
 

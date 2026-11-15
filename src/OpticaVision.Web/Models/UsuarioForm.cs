@@ -6,6 +6,7 @@ public sealed class UsuarioForm
 {
     [Required(ErrorMessage = "Escriba el nombre completo.")]
     [StringLength(150)]
+    [RegularExpression(@"\p{L}[\p{L}\p{M}]*(?:[ \x27\u2019-]\p{L}[\p{L}\p{M}]*)*", ErrorMessage = "Usa letras para el nombre. Puedes incluir espacios, guiones y apóstrofos.")]
     [Display(Name = "Nombre completo")]
     public string NombreCompleto { get; set; } = string.Empty;
 
@@ -31,3 +32,4 @@ public sealed class UsuarioForm
     [Display(Name = "Confirmar contraseña")]
     public string ConfirmarContrasena { get; set; } = string.Empty;
 }
+

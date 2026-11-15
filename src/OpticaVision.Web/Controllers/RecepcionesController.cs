@@ -6,7 +6,7 @@ using OpticaVision.Web.Models;
 
 namespace OpticaVision.Web.Controllers;
 
-[Authorize(Roles = "administrador,bodega")]
+[Authorize(Roles = "superadministrador,administrador,bodega")]
 [Route("bodega/recepciones")]
 public sealed class RecepcionesController(OpticaDatabase database) : Controller
 {
@@ -59,3 +59,4 @@ public sealed class RecepcionesController(OpticaDatabase database) : Controller
         return View("~/Views/Clientes/DatabaseUnavailable.cshtml");
     }
 }
+

@@ -6,7 +6,7 @@ using OpticaVision.Web.Models;
 
 namespace OpticaVision.Web.Controllers;
 
-[Authorize(Roles = "administrador,bodega")]
+[Authorize(Roles = "superadministrador,administrador,bodega")]
 [Route("bodega/kardex")]
 public sealed class KardexController(OpticaDatabase database) : Controller
 {
@@ -76,3 +76,4 @@ public sealed class KardexController(OpticaDatabase database) : Controller
         return View("~/Views/Clientes/DatabaseUnavailable.cshtml");
     }
 }
+

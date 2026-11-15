@@ -6,6 +6,10 @@
 <section class="module-intro">
     <div><p class="eyebrow">Cliente @Model.Codigo</p><h1>@Model.Nombres @Model.Apellidos</h1><p class="date-line">Registro creado el @Model.CreadoEn.ToLocalTime().ToString("dd/MM/yyyy")</p></div>
     <div class="button-row">
+        @if (Model.Activo && (User.IsInRole("superadministrador") || User.IsInRole("administrador") || User.IsInRole("recepcion")))
+        {
+            <a class="primary-button" asp-controller="Citas" asp-action="Crear" asp-route-id="@Model.Id">Agendar cita</a>
+        }
         @if (User.IsInRole("administrador") || User.IsInRole("superadministrador"))
         {
             <a class="secondary-button" asp-action="Editar" asp-route-id="@Model.Id">Editar</a>
@@ -21,3 +25,4 @@
         <div class="field-wide"><dt>Dirección</dt><dd>@(Model.Direccion ?? "No registrada")</dd></div>
     </dl>
 </section>
+

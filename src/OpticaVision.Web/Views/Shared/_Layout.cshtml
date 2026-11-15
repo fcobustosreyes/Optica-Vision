@@ -16,7 +16,7 @@
     };
     var allowedPages = role switch
     {
-        "administrador" => new[] { "inicio", "citas", "ventas", "compras", "inventario", "recepciones", "kardex", "clientes", "proveedores", "reportes" },
+        "superadministrador" or "administrador" => new[] { "inicio", "citas", "ventas", "compras", "inventario", "recepciones", "kardex", "clientes", "proveedores", "reportes" },
         "ventas" => new[] { "inicio", "ventas", "inventario", "clientes" },
         "recepcion" => new[] { "inicio", "citas", "clientes" },
         "bodega" => new[] { "inicio", "recepciones", "inventario", "kardex" },
@@ -107,4 +107,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
 

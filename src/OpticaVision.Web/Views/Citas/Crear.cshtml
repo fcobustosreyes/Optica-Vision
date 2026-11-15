@@ -1,0 +1,15 @@
+@model CitaForm
+@{
+    ViewData["Title"] = "Agendar cita";
+    ViewData["ActivePage"] = "citas";
+}
+<section class="module-intro"><div><p class="eyebrow">Agenda</p><h1>Agendar cita</h1><p>@ViewData["Cliente"]</p></div></section>
+<section class="panel form-panel">
+    <form asp-action="Crear" asp-route-id='@ViewData["ClienteId"]' method="post">
+        <div class="form-grid">
+            <div class="field"><label asp-for="Fecha"></label><input asp-for="Fecha" type="datetime-local" required /><span asp-validation-for="Fecha"></span></div>
+            <div class="field"><label asp-for="Servicio"></label><input asp-for="Servicio" maxlength="120" required /><span asp-validation-for="Servicio"></span></div>
+        </div>
+        <div class="form-actions"><a class="secondary-button" asp-controller="Clientes" asp-action="Detalles" asp-route-id='@ViewData["ClienteId"]'>Cancelar</a><button class="primary-button">Guardar cita</button></div>
+    </form>
+</section>

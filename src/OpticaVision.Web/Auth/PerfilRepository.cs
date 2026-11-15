@@ -12,8 +12,8 @@ public interface IPerfilRepository
     Task<bool> ExisteSuperadministradorAsync(CancellationToken cancellationToken);
     Task<Guid> CrearAsync(Guid authUserId, string correo, string nombreCompleto, string rol, Guid actorPerfilId, CancellationToken cancellationToken);
     Task<Guid> CrearPrimerSuperadministradorAsync(Guid authUserId, string correo, string nombreCompleto, CancellationToken cancellationToken);
-    Task<IReadOnlyList<PerfilLista>> ListarAsync(CancellationToken cancellationToken);
-    Task<bool> CambiarEstadoAsync(Guid perfilId, bool activo, Guid actorPerfilId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<PerfilLista>> ListarAsync(bool esPropietario, CancellationToken cancellationToken);
+    Task<bool> CambiarEstadoAsync(Guid perfilId, bool activo, Guid actorPerfilId, bool esPropietario, CancellationToken cancellationToken);
     Task MarcarContrasenaActualizadaAsync(Guid authUserId, CancellationToken cancellationToken);
 }
 
@@ -115,16 +115,18 @@ public sealed class PostgresPerfilRepository(OpticaDatabase database) : IPerfilR
         return profileId;
     }
 
-    public async Task<IReadOnlyList<PerfilLista>> ListarAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<PerfilLista>> ListarAsync(bool esPropietario, CancellationToken cancellationToken)
     {
         const string sql = """
             SELECT p.id, p.nombre_completo, COALESCE(p.correo_login, ''), r.nombre, p.activo, p.creado_en
             FROM optica.perfiles p
             JOIN optica.roles r ON r.id = p.rol_id
+            WHERE @propietario OR r.nombre <> 'superadministrador'
             ORDER BY p.activo DESC, p.nombre_completo, p.id;
             """;
         await using var connection = await database.DataSource.OpenConnectionAsync(cancellationToken);
         await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("propietario", esPropietario);
         var result = new List<PerfilLista>();
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
@@ -132,7 +134,7 @@ public sealed class PostgresPerfilRepository(OpticaDatabase database) : IPerfilR
         return result;
     }
 
-    public async Task<bool> CambiarEstadoAsync(Guid perfilId, bool activo, Guid actorPerfilId, CancellationToken cancellationToken)
+    public async Task<bool> CambiarEstadoAsync(Guid perfilId, bool activo, Guid actorPerfilId, bool esPropietario, CancellationToken cancellationToken)
     {
         await using var connection = await database.DataSource.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
@@ -142,7 +144,7 @@ public sealed class PostgresPerfilRepository(OpticaDatabase database) : IPerfilR
         await using var lockCommand = new NpgsqlCommand(lockSql, connection, transaction);
         lockCommand.Parameters.AddWithValue("id", perfilId);
         var role = await lockCommand.ExecuteScalarAsync(cancellationToken) as string;
-        if (role is null)
+        if (role is null || (!esPropietario && role is not ("recepcion" or "ventas" or "bodega")))
             return false;
         if (!activo && role == "superadministrador")
         {
@@ -191,3 +193,4 @@ public sealed class PostgresPerfilRepository(OpticaDatabase database) : IPerfilR
 
 public sealed class SetupAlreadyCompletedException : Exception { }
 public sealed class LastSuperadministratorException : Exception { }
+

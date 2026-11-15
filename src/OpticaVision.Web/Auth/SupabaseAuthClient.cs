@@ -27,7 +27,16 @@ public sealed class SupabaseAuthClient(HttpClient http, IConfiguration configura
 
         using var response = await http.SendAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
-            return null;
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                using var error = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+                if (error.RootElement.TryGetProperty("error_code", out var code)
+                    && code.GetString() == "invalid_credentials")
+                    return null;
+            }
+            response.EnsureSuccessStatusCode();
+        }
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var json = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
@@ -35,8 +44,9 @@ public sealed class SupabaseAuthClient(HttpClient http, IConfiguration configura
         if (!root.TryGetProperty("user", out var user)
             || !user.TryGetProperty("id", out var id)
             || !Guid.TryParse(id.GetString(), out var authUserId)
-            || !root.TryGetProperty("access_token", out var token))
-            return null;
+            || !root.TryGetProperty("access_token", out var token)
+            || string.IsNullOrWhiteSpace(token.GetString()))
+            throw new HttpRequestException("Respuesta de autenticación incompleta.");
 
         return new AuthSession(authUserId, token.GetString() ?? string.Empty);
     }

@@ -16,7 +16,7 @@ Esta entrega es la base de datos comercial para una aplicacion ASP.NET Core que 
 
 La tabla `roles` no equivale a roles del servidor PostgreSQL. El backend debe autenticar al usuario, comprobar el rol, la empresa y los permisos de cada operación, verificar que esté activo y asignar su identificador como responsable. Los campos de responsables no verifican automáticamente quién hizo la petición. Para anulaciones, los movimientos conservan el responsable original del documento; una auditoría del usuario que anula requiere ampliar esta versión.
 
-Los roles de aplicación son: superadministrador de plataforma, administrador de óptica, ventas, recepción y cliente. El superadministrador no obtiene acceso ordinario a los datos de las ópticas. La versión actual del esquema no incluye aislamiento entre varias empresas; antes de ofrecer una instalación compartida se debe incorporar y verificar el aislamiento por empresa. Cada consulta y escritura deberá quedar limitada al tenant del usuario autenticado.
+El superadministrador de Óptica Visión supervisa todas las áreas y las cuentas privilegiadas. El administrador consulta las operaciones y gestiona al personal de ventas, recepción y bodega. La versión actual del esquema no incluye aislamiento entre varias empresas; antes de ofrecer una instalación compartida se debe incorporar y verificar el aislamiento por empresa. Cada consulta y escritura deberá quedar limitada al tenant del usuario autenticado.
 
 Antes de conectar la aplicación, crear un usuario PostgreSQL propio para el servidor y concederle solo los permisos necesarios sobre este esquema. No usar la cuenta propietaria ni una clave de servicio en el navegador. Guardar las credenciales solo como secretos del servidor (por ejemplo, User Secrets en desarrollo y variables seguras en producción), nunca en archivos versionados o código enviado al cliente. La conexión de producción y los permisos mínimos del usuario PostgreSQL siguen pendientes de configuración y verificación.
 
@@ -94,3 +94,4 @@ WHERE bodega_id = 1 AND producto_id = 1 ORDER BY fecha, id;
 Los movimientos bloquean la fila de bodega durante la transaccion y actualizan el saldo con una restriccion que impide negativos. Esto serializa los movimientos de una bodega; es una decision sencilla para el alcance universitario. Mantenga las transacciones cortas. El backend debe gestionar reintentos ante interbloqueos o errores de serializacion y presentar mensajes entendibles.
 
 Los usuarios propietarios de la base pueden alterar o desactivar las protecciones: no son la cuenta recomendada para la aplicacion. El sistema no incluye sincronizacion sin conexion, restauracion automatica ni configuracion de copias de seguridad. Esos servicios se deben definir aparte.
+

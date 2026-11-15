@@ -5,6 +5,7 @@ namespace OpticaVision.Web.Models;
 public sealed class LoginForm
 {
     [Required(ErrorMessage = "Escriba el correo electrónico.")]
+    [StringLength(254)]
     [EmailAddress(ErrorMessage = "Escriba un correo válido.")]
     [Display(Name = "Correo electrónico")]
     public string Correo { get; set; } = string.Empty;
@@ -16,3 +17,4 @@ public sealed class LoginForm
 
     public string? Retorno { get; set; }
 }
+

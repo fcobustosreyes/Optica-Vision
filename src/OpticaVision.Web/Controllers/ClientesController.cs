@@ -5,7 +5,7 @@ using OpticaVision.Web.Models;
 
 namespace OpticaVision.Web.Controllers;
 
-[Authorize(Roles = "administrador,ventas,recepcion")]
+[Authorize(Roles = "superadministrador,administrador,ventas,recepcion")]
 [Route("clientes")]
 public sealed class ClientesController(IClienteRepository clientes, OpticaDatabase database) : Controller
 {
@@ -133,3 +133,4 @@ public sealed class ClientesController(IClienteRepository clientes, OpticaDataba
             : throw new UnauthorizedAccessException("La sesión no contiene un perfil activo.");
     }
 }
+

@@ -22,7 +22,7 @@ public sealed class UsuariosController(
             return BaseDeDatosNoConfigurada();
         ViewData["Title"] = "Usuarios";
         ViewData["ActivePage"] = "usuarios";
-        return View(await perfiles.ListarAsync(cancellationToken));
+        return View(await perfiles.ListarAsync(User.IsInRole("superadministrador"), cancellationToken));
     }
 
     [HttpGet("nuevo")]
@@ -83,7 +83,7 @@ public sealed class UsuariosController(
         }
         try
         {
-            if (!await perfiles.CambiarEstadoAsync(perfilId, activo, PerfilActual(), cancellationToken))
+            if (!await perfiles.CambiarEstadoAsync(perfilId, activo, PerfilActual(), User.IsInRole("superadministrador"), cancellationToken))
                 return NotFound();
             TempData["Mensaje"] = activo ? "Cuenta reactivada." : "Cuenta desactivada; el historial se conservó.";
         }
@@ -124,3 +124,4 @@ public sealed class UsuariosController(
     }
 
 }
+

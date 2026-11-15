@@ -85,15 +85,18 @@ public class HomeController(ConsultasOperativas consultas) : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 
+    private bool EsAdministrador => User.IsInRole("superadministrador") || User.IsInRole("administrador");
+
     private bool PuedeVerModulo(string? module) => (module ?? string.Empty).ToLowerInvariant() switch
     {
-        "citas" => User.IsInRole("administrador") || User.IsInRole("recepcion"),
-        "ventas" => User.IsInRole("administrador") || User.IsInRole("ventas"),
-        "compras" or "proveedores" or "reportes" => User.IsInRole("administrador"),
-        "inventario" => User.IsInRole("administrador") || User.IsInRole("ventas") || User.IsInRole("bodega"),
-        "recepciones" or "kardex" => User.IsInRole("administrador") || User.IsInRole("bodega"),
-        "clientes" => User.IsInRole("administrador") || User.IsInRole("ventas") || User.IsInRole("recepcion"),
+        "citas" => EsAdministrador || User.IsInRole("recepcion"),
+        "ventas" => EsAdministrador || User.IsInRole("ventas"),
+        "compras" or "proveedores" or "reportes" => EsAdministrador,
+        "inventario" => EsAdministrador || User.IsInRole("ventas") || User.IsInRole("bodega"),
+        "recepciones" or "kardex" => EsAdministrador || User.IsInRole("bodega"),
+        "clientes" => EsAdministrador || User.IsInRole("ventas") || User.IsInRole("recepcion"),
         _ => false
     };
 }
+
 

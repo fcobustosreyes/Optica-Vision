@@ -15,6 +15,7 @@ public sealed class CuentaController(
     ISupabaseAuthClient supabaseAuth,
     IPerfilRepository perfiles,
     OpticaDatabase database,
+    System.Threading.RateLimiting.PartitionedRateLimiter<string> intentos,
     ILogger<CuentaController> logger) : Controller
 {
     [AllowAnonymous]
@@ -39,10 +40,14 @@ public sealed class CuentaController(
 
         try
         {
+            using var intento = intentos.AttemptAcquire(form.Correo.Trim());
+            if (!intento.IsAcquired)
+                return DemasiadosIntentos(form);
             var session = await supabaseAuth.IniciarSesionAsync(form.Correo.Trim(), form.Contrasena, cancellationToken);
             if (session is null)
             {
-                ModelState.AddModelError(string.Empty, "No se pudo iniciar sesión. Verifique sus datos.");
+                ModelState.AddModelError(nameof(form.Contrasena),
+                    "Si el correo está bien escrito, la contraseña es incorrecta. Vuelve a ingresarla.");
                 return View("IniciarSesion", form);
             }
 
@@ -74,17 +79,29 @@ public sealed class CuentaController(
                 return RedirectToAction(nameof(CambiarContrasena));
             return LocalRedirect(form.Retorno ?? Url.Action("Index", "Home")!);
         }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            return DemasiadosIntentos(form);
+        }
         catch (SupabaseAuthNotConfiguredException)
         {
             ModelState.AddModelError(string.Empty, "Falta completar la configuración privada de Supabase en este servidor.");
             return View("IniciarSesion", form);
         }
-        catch (Exception ex) when (ex is HttpRequestException or TimeoutException or DatabaseNotConfiguredException or NpgsqlException)
+        catch (Exception ex) when (ex is HttpRequestException or TimeoutException or System.Text.Json.JsonException
+            or DatabaseNotConfiguredException or NpgsqlException || ex is OperationCanceledException && !cancellationToken.IsCancellationRequested)
         {
             logger.LogError(ex, "Falló el servicio de inicio de sesión.");
             ModelState.AddModelError(string.Empty, "No se pudo conectar con los servicios de inicio de sesión. Intente más tarde.");
             return View("IniciarSesion", form);
         }
+    }
+
+    private IActionResult DemasiadosIntentos(LoginForm form)
+    {
+        Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        ModelState.AddModelError(string.Empty, "Se alcanzó el límite de intentos. Espera unos minutos antes de volver a entrar.");
+        return View("IniciarSesion", form);
     }
 
     [Authorize]
@@ -144,3 +161,4 @@ public sealed class CuentaController(
     [HttpGet("acceso-denegado")]
     public IActionResult AccesoDenegado() => View("AccesoDenegado");
 }
+
