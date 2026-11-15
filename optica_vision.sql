@@ -410,7 +410,7 @@ CREATE VIEW inventario_actual AS
  COALESCE(e.cantidad,0) AS cantidad,p.stock_minimo,
  COALESCE(e.cantidad,0)<=p.stock_minimo AS stock_bajo
  FROM bodegas b CROSS JOIN productos p LEFT JOIN existencias e
- ON e.bodega_id=b.id AND e.producto_id=p.id;
+ ON e.bodega_id=b.id AND e.producto_id=p.id WHERE b.activo AND p.activo;
 CREATE VIEW pendientes_compra AS
  SELECT dc.id AS detalle_compra_id,dc.compra_id,dc.producto_id,dc.cantidad AS comprada,
  COALESCE(sum(dr.cantidad_recibida) FILTER (WHERE r.estado='confirmada'),0) AS recibida,
@@ -464,3 +464,4 @@ REVOKE ALL ON ALL FUNCTIONS IN SCHEMA optica FROM PUBLIC;
 -- (activo=false) y estados de anulación/cancelación para conservar trazabilidad.
 -- Roles definidos: superadministrador, administrador, ventas, recepcion y cliente.
 COMMIT;
+
