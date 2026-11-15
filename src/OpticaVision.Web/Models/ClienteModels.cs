@@ -29,6 +29,7 @@ public sealed class ClienteForm
 
     [StringLength(30, ErrorMessage = "Máximo 30 caracteres.")]
     [Display(Name = "Teléfono")]
+    [RegularExpression(@"(?:\+505[ -]?)?[578][0-9]{3}[ -]?[0-9]{4}", ErrorMessage = "Ingresa ocho dígitos que comiencen con 5, 7 u 8. Ejemplo 8888-1234.")]
     public string? Telefono { get; set; }
 
     [EmailAddress(ErrorMessage = "Escriba un correo válido.")]
@@ -47,4 +48,5 @@ public sealed class ClientesIndexViewModel
     public bool IncluirInactivos { get; init; }
     public required IReadOnlyList<ClienteRecord> Clientes { get; init; }
 }
+
 

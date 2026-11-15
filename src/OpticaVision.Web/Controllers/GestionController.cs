@@ -87,7 +87,7 @@ public sealed class GestionController(OpticaDatabase db) : Controller
     private static bool Valido(CampoGestion f,string v) => v.Length<=f.Maximo && f.Tipo switch {
         "nombre" => v.Any(char.IsLetter),
         "email" => new EmailAddressAttribute().IsValid(v),
-        "tel" => v.Count(char.IsDigit) is >= 7 and <= 15 && v.All(c=>char.IsDigit(c) || "+()- ".Contains(c)),
+        "tel" => System.Text.RegularExpressions.Regex.IsMatch(v,@"\A(?:\+505[ -]?)?[578][0-9]{3}[ -]?[0-9]{4}\z"),
         "positivo" or "int" => int.TryParse(v,out var n) && n >= (f.Tipo=="positivo"?1:0),
         "importe" or "numeric" => decimal.TryParse(v,NumberStyles.AllowDecimalPoint,CultureInfo.InvariantCulture,out var m)
             && m>=0 && m<1000000000000m && decimal.Round(m,2)==m && (f.Tipo!="importe" || m>0),
@@ -185,4 +185,5 @@ public sealed class GestionController(OpticaDatabase db) : Controller
         return RedirectToAction(nameof(Index),new {tipo,padre});
     }
 }
+
 

@@ -1,0 +1,586 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 17 /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R 32 0 R 34 0 R 36 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 526 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(Óptica Visión) Tj T*
+() Tj T*
+(Guía para estudiar el sistema y defender el código) Tj T*
+() Tj T*
+(Revisión del código del 15 de noviembre de 2026) Tj T*
+() Tj T*
+(Esta guía explica el funcionamiento administrativo, las reglas y los archivos principales) Tj T*
+(del proyecto. Los registros de exposición son ficticios. La compilación se verificó,) Tj T*
+(mientras la prueba integral de todos los flujos por rol continúa pendiente.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 1) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 1058 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(1 Arquitectura del sistema) Tj T*
+() Tj T*
+(Óptica Visión es una aplicación ASP.NET Core MVC en C# y .NET 10. Las vistas Razor usan) Tj T*
+(archivos .cshtml para generar HTML en el servidor. CSS define la presentación y JavaScript) Tj T*
+(aporta interacción. PostgreSQL está alojado en Supabase. Supabase Auth verifica las) Tj T*
+(credenciales y Render ejecuta el servidor mediante Docker.) Tj T*
+() Tj T*
+(El navegador solicita una ruta. La aplicación verifica la sesión y el rol. Un controlador) Tj T*
+(consulta o modifica la base, construye un modelo y devuelve una vista. Al guardar se recibe) Tj T*
+(un POST, se validan los campos y después se redirige a la lista.) Tj T*
+() Tj T*
+(MVC significa Modelo Vista Controlador. El modelo describe datos y validaciones. La vista) Tj T*
+(presenta formularios y resultados. El controlador coordina peticiones y operaciones. Razor) Tj T*
+(permite usar expresiones como @Model.Nombres y condiciones @if dentro de HTML.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 2) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 1356 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(2 Cómo abrir y recorrer el proyecto) Tj T*
+() Tj T*
+(En VS Code elegí Archivo y Abrir carpeta. Usá esta ruta.) Tj T*
+() Tj T*
+(C:\\Users\\Microsoft Windows\\Source\\Repos\\fcobustosreyes\\Optica-Vision\\src\\OpticaVision.Web) Tj T*
+() Tj T*
+(Program.cs registra servicios, configura conexiones, autenticación, autorización y rutas.) Tj T*
+(Controllers recibe peticiones. Models contiene formularios, validaciones y modelos de) Tj T*
+(pantalla. Views contiene las vistas .cshtml. Data accede a PostgreSQL. Auth integra Supabase) Tj T*
+(y los perfiles. wwwroot contiene CSS y JavaScript.) Tj T*
+() Tj T*
+(CuentaController gestiona inicio, salida y cambio de contraseña. ClientesController) Tj T*
+(administra clientes. CitasController agenda y cambia estados. GestionController administra) Tj T*
+(catálogos y documentos a partir de RecursosGestion.Todos. HomeController prepara el resumen.) Tj T*
+(UsuariosController gestiona cuentas y KardexController consulta movimientos.) Tj T*
+() Tj T*
+(El repositorio contiene Dockerfile para construir el contenedor, render.yaml para definir el) Tj T*
+(servicio y optica_vision.sql para documentar las tablas y reglas. La base publicada puede) Tj T*
+(incorporar columnas adicionales que deben verificarse al cambiar código.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 3) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 1648 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(3 Cuentas y permisos) Tj T*
+() Tj T*
+(Superadministrador accede a todas las áreas y administra cuentas privilegiadas.) Tj T*
+(Administrador gestiona las operaciones y el personal de ventas, recepción y bodega. Las) Tj T*
+(cuentas de superadministración quedan ocultas y protegidas frente a administración.) Tj T*
+() Tj T*
+(Recepción administra citas y puede crear y consultar clientes. La edición y desactivación de) Tj T*
+(clientes tienen permisos específicos reservados a administración y superadministración.) Tj T*
+(Ventas gestiona ventas y consulta inventario y clientes. Bodega gestiona productos,) Tj T*
+(catálogos de inventario, recepciones, conteos y consulta kardex.) Tj T*
+() Tj T*
+(La seguridad se comprueba en el servidor además del menú. Escribir una URL manualmente) Tj T*
+(también requiere autorización. El rol de bodega dispone de acciones de inventario según) Tj T*
+(Resolver en GestionController.) Tj T*
+() Tj T*
+(Supabase Auth comprueba correo y contraseña. Después PerfilRepository exige un perfil y rol) Tj T*
+(activos relacionados con auth_user_id. La cookie contiene claims con nombre, rol e) Tj T*
+(identificadores. PerfilCookieEvents revisa el perfil al validar la sesión. Desactivar una) Tj T*
+(cuenta provoca el rechazo de su acceso.) Tj T*
+() Tj T*
+(La cookie tiene una duración de ocho horas con renovación deslizante. Salir utiliza POST con) Tj T*
+(protección antifalsificación, intenta cerrar la sesión remota y elimina la sesión local.) Tj T*
+(Existe una protección para conservar al menos un superadministrador activo.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 4) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 1125 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(4 Compras y documentos) Tj T*
+() Tj T*
+(Una compra relaciona proveedor, factura o póliza y sus productos. Se crea en borrador, se) Tj T*
+(agregan cantidades y costos y luego se confirma. Una compra vacía debe ser rechazada. Los) Tj T*
+(detalles calculan cantidad por costo unitario.) Tj T*
+() Tj T*
+(Ejemplo. Doce monturas a C$ 350 dan un total de C$ 4,200. El número interno 11 identifica la) Tj T*
+(compra dentro del sistema. F-10482 identifica el documento emitido por el proveedor. El) Tj T*
+(código MON-3201 identifica el producto.) Tj T*
+() Tj T*
+(Los documentos confirmados quedan protegidos por reglas de PostgreSQL. Una compra que tiene) Tj T*
+(recepciones confirmadas exige resolverlas antes de su anulación. La historia se conserva con) Tj T*
+(estados y operaciones compensatorias.) Tj T*
+() Tj T*
+(La creación y edición de borradores se hace desde Gestionar compras. Los números internos) Tj T*
+(vienen de columnas de identidad de PostgreSQL. La factura o póliza se registra como dato) Tj T*
+(comercial del proveedor.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 5) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 1015 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(5 Recepción de mercancía) Tj T*
+() Tj T*
+(La recepción vincula una compra confirmada con una bodega. En el detalle se eligen líneas de) Tj T*
+(esa compra y unidades recibidas. Al confirmarse se generan entradas de inventario.) Tj T*
+() Tj T*
+(Si compraste doce unidades y llegan ocho, registrás ocho. Las cuatro restantes pueden llegar) Tj T*
+(en otra recepción. La suma recibida debe respetar la cantidad comprada. Una línea de otra) Tj T*
+(compra debe rechazarse.) Tj T*
+() Tj T*
+(Confirmar una compra prepara el documento para recepciones. Confirmar una recepción modifica) Tj T*
+(las existencias. El código de compra, la recepción y el documento del proveedor permiten) Tj T*
+(reconstruir el origen.) Tj T*
+() Tj T*
+(Anular una recepción genera un movimiento inverso. El saldo disponible debe permitir esa) Tj T*
+(salida. Las restricciones y disparadores se ejecutan dentro de la operación de base de) Tj T*
+(datos.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 6) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 17 0 R >>
+endobj
+17 0 obj
+<< /Length 990 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(6 Venta y pagos) Tj T*
+() Tj T*
+(Creá una venta indicando cliente cuando corresponda y bodega. Agregá producto, cantidad,) Tj T*
+(precio y descuento por unidad. Registrá pagos y confirmá cuando total y pagos coincidan.) Tj T*
+() Tj T*
+(Ejemplo. Dos monturas a C$ 700 con descuento de C$ 50 por unidad dan 2 × \(700 ? 50\) = C$) Tj T*
+(1,300. El descuento debe estar entre cero y el precio. Los pagos deben sumar C$ 1,300 para) Tj T*
+(confirmar.) Tj T*
+() Tj T*
+(Los métodos admitidos son efectivo, tarjeta y transferencia. La confirmación genera salidas) Tj T*
+(de inventario. Una venta con cantidad mayor al saldo debe rechazarse. La anulación genera) Tj T*
+(movimientos compensatorios.) Tj T*
+() Tj T*
+(El precio, descuento y subtotal están en detalle_ventas. pagos_venta contiene método, monto) Tj T*
+(y referencia. resumen_ventas reúne total y pagado calculados a partir de esas relaciones.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 7) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 19 0 R >>
+endobj
+19 0 obj
+<< /Length 1839 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(7 Inventario conteos y kardex) Tj T*
+() Tj T*
+(Productos almacena código, nombre, categoría, marca opcional, modelo, color, precio y) Tj T*
+(mínimo. Existencias relaciona producto y bodega. La cantidad se mantiene por movimientos. El) Tj T*
+(mismo producto puede tener saldos distintos en dos bodegas.) Tj T*
+() Tj T*
+(La vista inventario_actual combina bodegas y productos. Una combinación sin saldo aparece) Tj T*
+(con cero. Stock bajo significa cantidad menor o igual al mínimo. El total de filas del) Tj T*
+(inventario puede ser mayor que el número de productos.) Tj T*
+() Tj T*
+(iniciar_conteo genera una cabecera y un corte de cantidades. El personal registra la) Tj T*
+(cantidad física y justifica diferencias. Aprobar genera los ajustes. La cantidad original) Tj T*
+(del corte está protegida y la diferencia exige coherencia con el saldo antes de aplicarse.) Tj T*
+() Tj T*
+(Kardex muestra fecha, bodega, código de producto, producto, tipo, entrada, salida, saldo,) Tj T*
+(documento de compra, referencia interna y responsable. Ejemplo. Entrada 12 deja saldo 12.) Tj T*
+(Venta de 2 deja saldo 10. Ajuste de menos 1 deja saldo 9.) Tj T*
+() Tj T*
+(REC identifica una recepción interna. El número de factura o póliza identifica el documento) Tj T*
+(del proveedor. Ambas referencias cumplen funciones de trazabilidad. Las entradas por) Tj T*
+(recepción toman el documento desde su compra.) Tj T*
+() Tj T*
+(El SQL usa sum\(m.cantidad\) OVER con PARTITION BY bodega_id y producto_id y orden por fecha e) Tj T*
+(id. El acumulado se calcula antes de filtrar la búsqueda. GREATEST\(m.cantidad,0\) obtiene) Tj T*
+(entrada y GREATEST\(-m.cantidad,0\) obtiene salida positiva. La consulta limita los resultados) Tj T*
+(a 200 movimientos recientes.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 8) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 21 0 R >>
+endobj
+21 0 obj
+<< /Length 1753 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(8 Clientes citas y teléfonos) Tj T*
+() Tj T*
+(Los clientes son registros administrativos. Sus nombres y apellidos admiten letras,) Tj T*
+(espacios, guiones y apóstrofos. Se controla longitud y formato del correo cuando está) Tj T*
+(presente. El formulario actual carece de cédula y fecha de nacimiento, por lo que la edad) Tj T*
+(requiere una ampliación del modelo antes de poder validarse.) Tj T*
+() Tj T*
+(Desde la ficha de un cliente activo se agenda una cita. Se exige fecha y hora futuras y un) Tj T*
+(servicio. Se utiliza la zona America/Managua. La agenda limita a diez citas por día y) Tj T*
+(excluye las canceladas del cupo.) Tj T*
+() Tj T*
+(Un bloqueo transaccional por día protege las solicitudes simultáneas que pasan por) Tj T*
+(CitasController. Al editar se excluye la propia cita del conteo. Las citas pendientes o) Tj T*
+(confirmadas se pueden editar, confirmar, completar o cancelar. El código contempla) Tj T*
+(cliente_nombre cuando la base publicada exige esa columna.) Tj T*
+() Tj T*
+(La regla solicitada para teléfonos del sistema exige ocho dígitos nacionales y comienzo con) Tj T*
+(5, 7 u 8. Se admiten 88881234, 8888-1234, 7888-1234, 5888-1234 y +505 8888-1234. Valores con) Tj T*
+(siete o nueve dígitos, letras o inicio distinto se rechazan. El teléfono sigue siendo) Tj T*
+(opcional donde así lo define el formulario.) Tj T*
+() Tj T*
+(Esta regla es una decisión de alcance del sistema indicada por el usuario. No comprueba que) Tj T*
+(una línea exista o pertenezca al cliente. La validación se incorporó a ClienteForm y) Tj T*
+(GestionController y compiló correctamente. Su publicación está pendiente al preparar esta) Tj T*
+(guía.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 9) Tj ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 23 0 R >>
+endobj
+23 0 obj
+<< /Length 1165 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(9 Qué significa CRUD en este sistema) Tj T*
+() Tj T*
+(Crear registra una entidad o documento. Consultar muestra listas o detalles. Actualizar) Tj T*
+(permite cambiar datos según estado y rol. Eliminar se representa mediante desactivación o) Tj T*
+(anulación cuando se necesita conservar el historial.) Tj T*
+() Tj T*
+(Los catálogos se crean, editan, activan y desactivan. Las líneas de compras, ventas y) Tj T*
+(recepciones se pueden quitar mientras el documento está en borrador. Las cabeceras) Tj T*
+(confirmadas se conservan y admiten sus transiciones autorizadas.) Tj T*
+() Tj T*
+(Kardex reúne movimientos generados por documentos y conteos. Los reportes son cálculos de) Tj T*
+(operaciones. Para cambiar sus resultados se modifica el documento fuente mediante sus) Tj T*
+(acciones permitidas.) Tj T*
+() Tj T*
+(En Usuarios se puede crear cuenta, consultar, editar nombre, activar o desactivar según) Tj T*
+(permisos. La edición del nombre conserva el correo y el rol existentes. La asignación de) Tj T*
+(cuentas privilegiadas queda reservada a superadministración.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 10) Tj ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 25 0 R >>
+endobj
+25 0 obj
+<< /Length 2161 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(10 Cómo entender el código) Tj T*
+() Tj T*
+([Authorize\(Roles = "superadministrador,administrador,bodega"\)] exige uno de esos roles en el) Tj T*
+(controlador. User.IsInRole comprueba el rol al preparar una acción o una vista.) Tj T*
+() Tj T*
+(if \(!ModelState.IsValid\) return View\("Formulario", form\) devuelve el formulario cuando) Tj T*
+(existen errores de entrada. Los atributos Required, StringLength, EmailAddress y) Tj T*
+(RegularExpression contribuyen a esa validación.) Tj T*
+() Tj T*
+(AddWithValue\("id", id\) envía un parámetro a Npgsql. La sentencia usa @id y el valor viaja) Tj T*
+(separado del SQL. En el gestor, las tablas y campos provienen de RecursosGestion.Todos) Tj T*
+(definido en código. Los valores enviados por el usuario se parametrizan.) Tj T*
+() Tj T*
+(async y await permiten esperar operaciones HTTP y de base sin mantener ocupado el hilo) Tj T*
+(durante la espera. CancellationToken permite transmitir cancelación. await using libera) Tj T*
+(conexiones, lectores y comandos al terminar su alcance.) Tj T*
+() Tj T*
+(Una transacción agrupa escrituras que deben completarse juntas. Si ocurre un error antes del) Tj T*
+(commit, puede revertirse el conjunto. Los disparadores protegen detalles y generan) Tj T*
+(movimientos durante confirmaciones y anulaciones.) Tj T*
+() Tj T*
+(Esquema optica organiza las tablas. Primary key identifica una fila. Foreign key relaciona) Tj T*
+(entidades existentes. CHECK exige condiciones como cantidad positiva. UNIQUE evita códigos) Tj T*
+(repetidos. Las columnas calculadas generan subtotales.) Tj T*
+() Tj T*
+(El sistema mezcla Entity Framework Core y SQL directo con Npgsql. IClienteRepository define) Tj T*
+(las operaciones del cliente. Program.cs registra EfClienteRepository cuando existe la) Tj T*
+(conexión configurada. Otros módulos ejecutan consultas Npgsql.) Tj T*
+() Tj T*
+(Para estudiar un método preguntate qué recibe, qué valida, qué consulta o escribe, qué) Tj T*
+(ocurre si falla y qué devuelve al navegador. Abrí el archivo con Ctrl+P en VS Code y buscá) Tj T*
+(el método con Ctrl+F.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 11) Tj ET
+endstream
+endobj
+26 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 27 0 R >>
+endobj
+27 0 obj
+<< /Length 1275 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(11 Validaciones y límites técnicos) Tj T*
+() Tj T*
+(GestionController valida cantidades positivas, mínimos desde cero, importes con hasta dos) Tj T*
+(decimales y selección de referencias admitidas. Nombre comercial o modelo exige al menos una) Tj T*
+(letra y puede contener otros caracteres. Los nombres personales tienen una expresión más) Tj T*
+(estricta.) Tj T*
+() Tj T*
+(Program.cs configura diez solicitudes de acceso por correo en una ventana de diez minutos.) Tj T*
+(Cuenta las solicitudes realizadas durante la ventana y funciona en memoria del proceso.) Tj T*
+(Reiniciar el servicio reinicia ese contador. Supabase puede aplicar sus propios límites.) Tj T*
+() Tj T*
+(Los POST usan token antifalsificación. Los controladores revisan autorización. La cookie de) Tj T*
+(sesión es HttpOnly y la configuración de producción exige su transmisión segura. Los valores) Tj T*
+(secretos pertenecen a la configuración del servidor.) Tj T*
+() Tj T*
+(Las reglas escritas en el código necesitan pruebas reales. Compilar demuestra que el) Tj T*
+(proyecto construye. Para acreditar una operación completa se debe ejecutar el escenario y) Tj T*
+(revisar su resultado en base y pantalla.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 12) Tj ET
+endstream
+endobj
+28 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 29 0 R >>
+endobj
+29 0 obj
+<< /Length 1114 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(12 Base de datos para memorizar) Tj T*
+() Tj T*
+(Acceso agrupa roles, perfiles y auditoria_eventos. Atención agrupa clientes y citas.) Tj T*
+(Catálogos agrupa proveedores, categorias, marcas, productos y bodegas.) Tj T*
+() Tj T*
+(Compras contiene compras y detalle_compras. Recepción contiene recepciones y) Tj T*
+(detalle_recepciones. Venta contiene ventas, detalle_ventas y pagos_venta. Inventario) Tj T*
+(contiene existencias, movimientos_inventario, conteos_inventario y detalle_conteos.) Tj T*
+() Tj T*
+(resumen_compras calcula importes por compra. resumen_ventas agrega venta y pagos.) Tj T*
+(inventario_actual presenta stock por bodega. pendientes_compra calcula lo comprado pendiente) Tj T*
+(de recibir.) Tj T*
+() Tj T*
+(Los datos de exposición son ficticios. Se prepararon al menos diez registros por tabla,) Tj T*
+(incluyendo perfiles adicionales inactivos. La existencia de esos registros permite estudiar) Tj T*
+(relaciones y pantallas y requiere mantener la distinción con operaciones comerciales reales.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 13) Tj ET
+endstream
+endobj
+30 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 31 0 R >>
+endobj
+31 0 obj
+<< /Length 1063 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(13 Publicación y ejecución) Tj T*
+() Tj T*
+(El navegador se comunica por HTTPS con Render. El contenedor ejecuta ASP.NET Core. El) Tj T*
+(servidor usa la cadena PostgreSQL para la base y la integración de Auth para el acceso.) Tj T*
+() Tj T*
+(Dockerfile restaura y publica el proyecto con una imagen SDK y ejecuta la salida con una) Tj T*
+(imagen ASP.NET. Render publica esa ejecución. GitHub almacena la versión del código.) Tj T*
+() Tj T*
+(Guardar en VS Code cambia la copia local. Commit registra la revisión, push la envía a) Tj T*
+(GitHub y el despliegue de Render publica el código. Por eso una mejora local puede tardar en) Tj T*
+(aparecer en la URL.) Tj T*
+() Tj T*
+(URL del sistema) Tj T*
+() Tj T*
+(https://optica-vision.onrender.com/) Tj T*
+() Tj T*
+(Después de algunos despliegues la sesión puede exigir un nuevo inicio. El servicio gratuito) Tj T*
+(puede tardar en responder después de inactividad. Esta guía omite contraseñas y valores) Tj T*
+(secretos.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 14) Tj ET
+endstream
+endobj
+32 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 33 0 R >>
+endobj
+33 0 obj
+<< /Length 1106 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(14 Práctica para la defensa) Tj T*
+() Tj T*
+(Explicá el recorrido de una compra con doce unidades. Creá el borrador, agregá su detalle y) Tj T*
+(confirmalo. Registrá una recepción parcial. Verificá la entrada en kardex. Prepará una venta) Tj T*
+(con pago completo y comprobá su salida y saldo.) Tj T*
+() Tj T*
+(Probá rechazos por compra vacía, recepción mayor a la compra, venta sin saldo, pago) Tj T*
+(incompleto y fecha pasada. Intentá entrar con un rol restringido por URL. Anotá resultado) Tj T*
+(esperado y observado antes de afirmar que la validación pasó.) Tj T*
+() Tj T*
+(Para probar edición, creá un borrador y cambiá cantidades. Después confirmalo y revisá que) Tj T*
+(los detalles estén protegidos. Para probar trazabilidad, anulá un documento admitido y) Tj T*
+(observá los movimientos compensatorios.) Tj T*
+() Tj T*
+(Realizá las pruebas sobre registros destinados a práctica y revisá el impacto en inventario.) Tj T*
+(El conteo físico exige justificar diferencias para explicar cualquier ajuste.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 15) Tj ET
+endstream
+endobj
+34 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 35 0 R >>
+endobj
+35 0 obj
+<< /Length 1624 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(15 Preguntas y respuestas para estudiar) Tj T*
+() Tj T*
+(¿Por qué MVC? Organiza peticiones, datos y vistas y permite localizar cada responsabilidad.) Tj T*
+() Tj T*
+(¿Por qué cshtml? Razor permite generar HTML con modelos y formularios desde ASP.NET Core.) Tj T*
+() Tj T*
+(¿Compra y recepción son iguales? La compra documenta lo adquirido y la recepción registra lo) Tj T*
+(recibido en una bodega.) Tj T*
+() Tj T*
+(¿Cómo se calcula una venta? Cantidad por precio menos descuento unitario, sumando sus) Tj T*
+(líneas. Los pagos deben coincidir al confirmar.) Tj T*
+() Tj T*
+(¿Cómo evitás saldo negativo? Las reglas de PostgreSQL aplican movimientos y verifican) Tj T*
+(cantidades. Debe demostrarse con un caso de venta superior al saldo.) Tj T*
+() Tj T*
+(¿Por qué conservar anulaciones? Mantienen la historia y permiten seguir el efecto de) Tj T*
+(movimientos inversos.) Tj T*
+() Tj T*
+(¿Dónde se verifican contraseñas? En Supabase Auth y después se exige el perfil activo de la) Tj T*
+(aplicación.) Tj T*
+() Tj T*
+(¿Administrador y superadministrador? Comparten áreas operativas. Superadministración) Tj T*
+(administra cuentas privilegiadas y supervisa el conjunto.) Tj T*
+() Tj T*
+(¿Qué son los números internos? Identificadores generados para relaciones. La factura y el) Tj T*
+(código de producto tienen funciones distintas.) Tj T*
+() Tj T*
+(¿Qué falta verificar? La prueba integral por rol, los casos simultáneos y la auditoría) Tj T*
+(completa de las escrituras. Las mejoras deben probarse antes de declararlas terminadas.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 16) Tj ET
+endstream
+endobj
+36 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 37 0 R >>
+endobj
+37 0 obj
+<< /Length 1068 >>
+stream
+BT /F1 11 Tf 48 744 Td 14 TL
+(16 Guion corto para exponer) Tj T*
+() Tj T*
+(Desarrollamos una aplicación administrativa web para Óptica Visión con ASP.NET Core MVC.) Tj T*
+(Usamos vistas Razor para la interfaz, PostgreSQL en Supabase para los datos y Supabase Auth) Tj T*
+(para validar acceso. Cada rol dispone de permisos en el menú y en el servidor.) Tj T*
+() Tj T*
+(El flujo principal comienza en la compra, continúa en la recepción y genera entradas por) Tj T*
+(bodega. Las ventas confirmadas generan salidas cuando existen productos y el pago está) Tj T*
+(completo. El kardex presenta el historial y el saldo acumulado. Los conteos permiten) Tj T*
+(justificar ajustes.) Tj T*
+() Tj T*
+(El código organiza controladores, modelos, vistas y repositorios. Las validaciones se) Tj T*
+(complementan con restricciones y disparadores de la base. Los documentos conservan su) Tj T*
+(historial mediante estados. Para demostrar el comportamiento ejecutamos casos concretos y) Tj T*
+(comprobamos el resultado.) Tj T*
+() Tj T*
+ET
+BT /F1 9 Tf 48 30 Td (Optica Vision - 17) Tj ET
+endstream
+endobj
+xref
+0 38
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000232 00000 n 
+0000000329 00000 n 
+0000000455 00000 n 
+0000001032 00000 n 
+0000001158 00000 n 
+0000002268 00000 n 
+0000002394 00000 n 
+0000003802 00000 n 
+0000003930 00000 n 
+0000005631 00000 n 
+0000005759 00000 n 
+0000006937 00000 n 
+0000007065 00000 n 
+0000008133 00000 n 
+0000008261 00000 n 
+0000009303 00000 n 
+0000009431 00000 n 
+0000011323 00000 n 
+0000011451 00000 n 
+0000013257 00000 n 
+0000013385 00000 n 
+0000014603 00000 n 
+0000014731 00000 n 
+0000016945 00000 n 
+0000017073 00000 n 
+0000018401 00000 n 
+0000018529 00000 n 
+0000019696 00000 n 
+0000019824 00000 n 
+0000020940 00000 n 
+0000021068 00000 n 
+0000022227 00000 n 
+0000022355 00000 n 
+0000024032 00000 n 
+0000024160 00000 n 
+trailer
+<< /Size 38 /Root 1 0 R >>
+startxref
+25281
+%%EOF
