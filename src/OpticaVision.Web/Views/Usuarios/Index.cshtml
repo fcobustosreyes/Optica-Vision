@@ -11,6 +11,11 @@
 @foreach (var perfil in Model)
 {
     <tr><td>@perfil.NombreCompleto</td><td>@perfil.Correo</td><td>@perfil.Rol</td><td><span class="status-pill @(perfil.Activo ? "activo" : "cancelada")">@(perfil.Activo ? "Activo" : "Desactivado")</span></td><td class="action-cell">
+    @if(User.IsInRole("superadministrador") || perfil.Rol is "recepcion" or "ventas" or "bodega"){
+        <details><summary>Editar nombre</summary><form method="post" asp-action="EditarNombre" asp-route-perfilId="@perfil.PerfilId">
+        <label>Nombre completo <input name="nombre" value="@perfil.NombreCompleto" maxlength="150" required /></label><button class="text-button">Guardar</button>
+        </form></details>
+    }
     @if (perfil.PerfilId != Guid.Parse(User.FindFirst("optica:perfil_id")!.Value) && (User.IsInRole("superadministrador") || perfil.Rol is "recepcion" or "ventas" or "bodega"))
     {
         <form method="post" asp-action="@(perfil.Activo ? "Desactivar" : "Reactivar")" asp-route-perfilId="@perfil.PerfilId"><button class="text-button" type="submit">@(perfil.Activo ? "Desactivar" : "Reactivar")</button></form>
@@ -19,4 +24,5 @@
 }
 @if (Model.Count == 0) { <tr><td colspan="5" class="empty-cell">No hay perfiles registrados.</td></tr> }
 </tbody></table></div><div class="panel-foot">Las cuentas desactivadas permanecen en el historial y pierden acceso.</div></section>
+
 

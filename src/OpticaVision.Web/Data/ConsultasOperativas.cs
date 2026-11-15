@@ -26,7 +26,7 @@ public sealed class ConsultasOperativas(OpticaDatabase database)
             "citas" => ("Citas", "Consulta la agenda y el estado de cada atención.", ["Fecha", "Hora", "Cliente", "Teléfono", "Servicio", "Estado"],
                 """
                 SELECT to_char(a.fecha AT TIME ZONE 'America/Managua','DD/MM/YYYY'), to_char(a.fecha AT TIME ZONE 'America/Managua','HH24:MI'),
-                       concat_ws(' ', c.nombres,c.apellidos), c.telefono, a.servicio, initcap(a.estado)
+                       concat_ws(' ', c.nombres,c.apellidos), c.telefono, a.servicio, initcap(a.estado), a.cliente_id::text, a.id::text
                 FROM optica.citas a JOIN optica.clientes c ON c.id=a.cliente_id ORDER BY a.fecha DESC, a.id DESC
                 """),
             "ventas" => ("Ventas", "Consulta los importes y pagos de las ventas registradas.", ["Venta", "Fecha", "Cliente", "Total (C$)", "Pagado (C$)", "Estado"],
@@ -35,7 +35,7 @@ public sealed class ConsultasOperativas(OpticaDatabase database)
                        coalesce(nullif(concat_ws(' ', c.nombres,c.apellidos),''),'Consumidor final'), v.total::text, v.pagado::text, initcap(v.estado)
                 FROM optica.resumen_ventas v LEFT JOIN optica.clientes c ON c.id=v.cliente_id ORDER BY v.fecha DESC, v.id DESC
                 """),
-            "compras" => ("Compras", "Consulta las compras por proveedor y documento.", ["Compra", "Fecha", "Proveedor", "Documento", "Total (C$)", "Estado"],
+            "compras" => ("Compras", "Consulta las compras por proveedor y documento.", ["N.º interno", "Fecha", "Proveedor", "Factura o póliza", "Total (C$)", "Estado"],
                 """
                 SELECT c.id::text, to_char(c.fecha AT TIME ZONE 'America/Managua','DD/MM/YYYY'), p.nombre,
                        c.numero_documento_proveedor, c.total::text, initcap(c.estado)
@@ -69,3 +69,5 @@ public sealed class ConsultasOperativas(OpticaDatabase database)
         };
     }
 }
+
+

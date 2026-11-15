@@ -317,3 +317,8 @@ tbody tr:hover { background: #f7fbfc; }
   .metric-grid { grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); }
 }
 [hidden] { display: none !important; }
+.sidebar .main-nav { overflow-y: auto; min-height: 0; }
+.sidebar .logout-form { margin-top: auto; padding-top: .65rem; flex-shrink: 0; border-top: 1px solid #ffffff40; }
+.sidebar .logout-button { color: white; padding: .65rem; font-size: .9rem; }
+.topbar .user-menu { margin-left: auto; min-width: 0; }
+.topbar .user-copy { display: grid; text-align: right; overflow-wrap: anywhere; }

@@ -1,0 +1,30 @@
+@model GestionPagina
+@{
+    var r=Model.Recurso;
+    ViewData["Title"]=r.Titulo;
+    ViewData["ActivePage"]=r.Modulo;
+}
+<section class="module-intro"><div><p class="eyebrow">@r.Titulo</p><h1>@(Model.Id.HasValue ? "Editar registro" : "Nuevo registro")</h1></div></section>
+<section class="panel form-panel">
+<form method="post" asp-action="Guardar" asp-route-tipo="@r.Tabla" asp-route-padre="@Model.Padre" asp-route-id="@Model.Id">
+<div asp-validation-summary="All" class="validation-summary"></div>
+<div class="form-grid">
+@foreach(var f in r.Campos){
+    var valor=Model.Valores.GetValueOrDefault(f.Columna);
+    <div class="field"><label for="@f.Columna">@f.Etiqueta</label>
+    @if((r.Tabla=="detalle_conteos" && f.Columna is "producto_id" or "cantidad_sistema") || (r.Tabla=="conteos_inventario" && Model.Id.HasValue && f.Columna=="bodega_id")){
+        <span>@(Model.Opciones.GetValueOrDefault(f.Columna)?.GetValueOrDefault(valor ?? "") ?? valor)</span>
+    }else if(Model.Opciones.ContainsKey(f.Columna) || f.Tipo=="metodo"){
+        var opciones=f.Tipo=="metodo" ? new Dictionary<string,string>{{"efectivo","Efectivo"},{"tarjeta","Tarjeta"},{"transferencia","Transferencia"}} : Model.Opciones[f.Columna];
+        <select id="@f.Columna" name="valores[@f.Columna]" required="@f.Obligatorio"><option value="">Seleccionar</option>
+        @foreach(var opcion in opciones){<option value="@opcion.Key" selected="@(valor==opcion.Key)">@opcion.Value</option>}
+        </select>
+    }else{
+        var tipo=f.Tipo switch {"email"=>"email","tel"=>"tel","numeric" or "importe" or "int" or "positivo"=>"number",_=>"text"};
+        <input id="@f.Columna" name="valores[@f.Columna]" type="@tipo" value="@(valor ?? (f.Columna=="descuento_unitario"?"0":null))" maxlength="@f.Maximo" required="@f.Obligatorio" min="@(f.Tipo=="positivo"?"1":f.Tipo=="importe"?"0.01":"0")" step="@(f.Tipo is "numeric" or "importe"?"0.01":"1")" />
+    }</div>
+}
+</div>
+<div class="form-actions"><a class="secondary-button" asp-action="Index" asp-route-tipo="@r.Tabla" asp-route-padre="@Model.Padre">Cancelar</a><button class="primary-button">Guardar</button></div>
+</form></section>
+

@@ -82,7 +82,9 @@
                     </a>
                 }
             </nav>
-            <div class="sidebar-footer"><span class="status-dot"></span> Sistema de gestión</div>
+            <form method="post" asp-controller="Cuenta" asp-action="CerrarSesion" class="logout-form">
+                    <button class="text-button logout-button" type="submit">Salir</button>
+                </form>
         </aside>
         <div class="main-area">
             <header class="topbar">
@@ -92,13 +94,11 @@
                     <span class="avatar" aria-hidden="true">@((User.Identity?.Name ?? "OV").Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.FirstOrDefault())</span>
                     <span class="user-copy"><strong>@User.Identity?.Name</strong><small>@role</small></span>
                 </div>
-                <form method="post" asp-controller="Cuenta" asp-action="CerrarSesion" class="logout-form">
-                    <button class="text-button logout-button" type="submit">Salir</button>
-                </form>
+                
             </header>
             <main class="content" id="mainContent">
                 @RenderBody()
-                <p class="demo-note"><span aria-hidden="true">i</span> Clientes ya usa PostgreSQL. Las demás pantallas siguen en desarrollo.</p>
+
             </main>
         </div>
     </div>
@@ -107,5 +107,6 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
 
 

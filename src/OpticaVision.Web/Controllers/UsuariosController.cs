@@ -64,6 +64,32 @@ public sealed class UsuariosController(
         }
     }
 
+    [HttpPost("{perfilId:guid}/nombre"),ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditarNombre(Guid perfilId,string? nombre,CancellationToken ct)
+    {
+        nombre=nombre?.Trim();
+        if(string.IsNullOrEmpty(nombre) || nombre.Length>150 ||
+            !System.Text.RegularExpressions.Regex.IsMatch(nombre,@"^\p{L}[\p{L}\p{M}]*(?:[ \x27\u2019-]\p{L}[\p{L}\p{M}]*)*$"))
+        {
+            TempData["Error"]="Escribe un nombre válido de hasta 150 caracteres.";
+            return RedirectToAction(nameof(Index));
+        }
+        await using var cmd=database.DataSource.CreateCommand("""
+            with editado as (
+                update optica.perfiles p set nombre_completo=@nombre from optica.roles r
+                where p.id=@id and r.id=p.rol_id and (@propietario or r.nombre in ('ventas','recepcion','bodega'))
+                returning p.id
+            )
+            insert into optica.auditoria_eventos(actor_perfil_id,tipo,entidad,detalles)
+            select @actor,'usuario.nombre_actualizado','perfiles',jsonb_build_object('perfil_id',editado.id) from editado
+            """);
+        cmd.Parameters.AddWithValue("nombre",nombre);
+        cmd.Parameters.AddWithValue("id",perfilId);
+        cmd.Parameters.AddWithValue("actor",PerfilActual());
+        cmd.Parameters.AddWithValue("propietario",User.IsInRole("superadministrador"));
+        if(await cmd.ExecuteNonQueryAsync(ct)!=1) return NotFound();
+        return RedirectToAction(nameof(Index));
+    }
     [HttpPost("{perfilId:guid}/desactivar")]
     [ValidateAntiForgeryToken]
     public Task<IActionResult> Desactivar(Guid perfilId, CancellationToken cancellationToken) => CambiarEstado(perfilId, false, cancellationToken);
@@ -124,4 +150,5 @@ public sealed class UsuariosController(
     }
 
 }
+
 

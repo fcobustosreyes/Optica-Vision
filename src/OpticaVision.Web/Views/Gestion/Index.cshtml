@@ -1,0 +1,45 @@
+@model GestionPagina
+@{
+    var r=Model.Recurso;
+    ViewData["Title"]=r.Titulo;
+    ViewData["ActivePage"]=r.Modulo;
+}
+<section class="module-intro"><div><h1>@r.Titulo</h1>
+@if(Model.Padre.HasValue){<p>Documento interno n.º @Model.Padre</p>}
+</div>
+<div class="button-row">
+@if(r.Padre is not null){<a class="secondary-button" asp-action="Index" asp-route-tipo="@r.Padre">Volver a documentos</a>}
+@if(Model.Editable && r.Tabla!="detalle_conteos"){<a class="primary-button" asp-action="Formulario" asp-route-tipo="@r.Tabla" asp-route-padre="@Model.Padre">Agregar registro</a>}
+</div></section>
+@if(TempData["GestionError"] is string error){<p class="validation-summary" role="alert">@error</p>}
+<section class="panel list-panel">
+<div class="list-toolbar"><label class="search-box">Buscar <input id="buscar" type="search" aria-label="Buscar en los registros" /></label></div>
+<div class="table-wrap"><table><thead><tr><th>N.º interno</th>@foreach(var f in r.Campos){<th>@f.Etiqueta</th>}<th>Estado</th><th>Acciones</th></tr></thead>
+<tbody>
+@foreach(var fila in Model.Filas){
+<tr><td>@fila.Id</td>
+@for(int i=0;i<r.Campos.Length;i++){
+    var v=fila.Valores[i];
+    var texto=Model.Opciones.GetValueOrDefault(r.Campos[i].Columna)?.GetValueOrDefault(v) ?? v;
+    <td>@(texto==""?"—":texto)</td>
+}
+<td>@(r.Padre is null ? fila.Estado : Model.Editable ? "Borrador" : "Cerrado")</td><td><div class="button-row">
+@if(Model.Editable && (!r.EsDocumento || fila.Estado is "borrador" or "abierto")){
+<a asp-action="Formulario" asp-route-tipo="@r.Tabla" asp-route-id="@fila.Id" asp-route-padre="@Model.Padre">Editar</a>}
+@foreach(var detalle in RecursosGestion.Todos.Values.Where(x=>x.Padre==r.Tabla)){
+<a asp-action="Index" asp-route-tipo="@detalle.Tabla" asp-route-padre="@fila.Id">@detalle.Titulo</a>}
+@{
+    string[] acciones = r.Tabla=="conteos_inventario" ? (fila.Estado=="abierto" ? ["aprobar","cancelar"] : []) : r.EsDocumento ? fila.Estado switch {"borrador"=>["confirmar","anular"],"confirmada"=>["anular"],_=>[]} :
+        r.EsCatalogo ? [fila.Estado=="activo"?"desactivar":"activar"] : Model.Editable && r.Tabla!="detalle_conteos" ? ["quitar"] : [];
+}
+@foreach(var accion in acciones){
+<form method="post" asp-action="EstadoRegistro" asp-route-tipo="@r.Tabla" asp-route-id="@fila.Id" asp-route-padre="@Model.Padre" onsubmit="return confirm('¿Aplicar esta acción al registro seleccionado?')">
+<button type="submit" class="text-button" name="accion" value="@accion">@(char.ToUpper(accion[0])+accion.Substring(1))</button></form>}
+</div></td></tr>}
+</tbody></table></div>
+@if(Model.Filas.Count==0){<p class="panel-foot">Todavía no hay registros.</p>}
+</section>
+@section Scripts {
+<script>document.querySelector('#buscar').addEventListener('input',function(){for(const row of document.querySelectorAll('tbody tr'))row.hidden=!row.textContent.toLowerCase().includes(this.value.trim().toLowerCase());});</script>
+}
+

@@ -1,5 +1,12 @@
 @model ModulePageViewModel
 @{
+    var gestor = User.IsInRole("superadministrador") || User.IsInRole("administrador");
+    var destinos = Model.Key switch {
+        "inventario" when gestor || User.IsInRole("bodega") => new[]{"productos","categorias","marcas","bodegas","conteos_inventario"},
+        "compras" or "ventas" or "proveedores" => new[]{Model.Key},
+        "reportes" => new[]{"ventas","compras"},
+        _ => Array.Empty<string>()
+    };
     ViewData["Title"] = Model.Title;
     ViewData["ActivePage"] = Model.Key;
 }
@@ -10,6 +17,9 @@
         <h1>@Model.Title</h1>
         <p class="date-line">@Model.Description</p>
     </div>
+    <div class="button-row">@foreach(var tipo in destinos){
+        <a class="secondary-button" asp-controller="Gestion" asp-action="Index" asp-route-tipo="@tipo">Gestionar @RecursosGestion.Todos[tipo].Titulo.ToLowerInvariant()</a>
+    }</div>
 </section>
 
 @if (Model.Key == "citas")
@@ -24,15 +34,15 @@
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr>@foreach (var column in Model.Columns){<th>@column</th>}</tr></thead>
+            <thead><tr>@foreach (var column in Model.Columns){<th>@column</th>}@if(Model.Key=="citas"){<th>Acciones</th>}</tr></thead>
             <tbody>
                 @foreach (var row in Model.Rows)
                 {
                     <tr>
-                        @for (var index = 0; index < row.Count; index++)
+                        @for (var index = 0; index < Model.Columns.Count; index++)
                         {
                             var value = row[index];
-                            var last = index == row.Count - 1;
+                            var last = index == Model.Columns.Count - 1;
                             <td>
                                 @if (last && (value is "Pendiente" or "Confirmada" or "Borrador" or "Reponer" or "Activo"))
                                 {
@@ -41,6 +51,14 @@
                                 else { @value }
                             </td>
                         }
+                        @if(Model.Key=="citas"){
+                            <td>@if(row[5] is "Pendiente" or "Confirmada"){
+                            <a asp-controller="Citas" asp-action="Crear" asp-route-id="@row[6]" asp-route-citaId="@row[7]">Editar cita</a>
+                            <form method="post" asp-controller="Citas" asp-action="CambiarEstado" asp-route-id="@row[6]" asp-route-citaId="@row[7]">
+                                @if(row[5]=="Pendiente"){<button class="text-button" name="estado" value="confirmada">Confirmar</button>}
+                                <button class="text-button" name="estado" value="completada">Completar</button>
+                                <button class="text-button" name="estado" value="cancelada">Cancelar cita</button>
+                            </form>}</td>}
                     </tr>
                 }
             </tbody>
@@ -62,5 +80,6 @@
         });
     </script>
 }
+
 
 

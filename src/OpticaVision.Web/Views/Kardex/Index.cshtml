@@ -10,6 +10,7 @@
         <h1>Kardex</h1>
         <p class="date-line">Historial de entradas, salidas y ajustes con saldo acumulado por producto y bodega.</p>
     </div>
+<div class="button-row"><a class="secondary-button" asp-controller="Gestion" asp-action="Index" asp-route-tipo="conteos_inventario">Ajustar por conteo</a><a class="secondary-button" asp-controller="Gestion" asp-action="Index" asp-route-tipo="recepciones">Gestionar recepciones</a></div>
 </section>
 
 <section class="panel list-panel">
@@ -49,4 +50,5 @@
     </div>
     <div class="panel-foot">El saldo se calcula en orden cronol&oacute;gico. Se muestran hasta 200 movimientos recientes.</div>
 </section>
+
 
